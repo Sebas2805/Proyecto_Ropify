@@ -57,7 +57,7 @@ public class UsuarioController {
         return "redirect:/usuarios";  // Redirigir a la lista de productos después de la actualización
     }
   
-     @GetMapping("/inactivarUsuario/{idUsuario}")
+     @GetMapping("/eliminarUsuario/{idUsuario}")
     public String eliminarUsuario(@PathVariable("idUsuario") int id, RedirectAttributes redirectAttributes) {
         String mensaje = usuarioService.eliminarUsuario(id);
         redirectAttributes.addFlashAttribute("mensaje", mensaje);

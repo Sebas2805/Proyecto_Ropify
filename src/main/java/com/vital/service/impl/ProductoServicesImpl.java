@@ -27,9 +27,8 @@ public class ProductoServicesImpl implements ProductoService
     
      @Transactional
     public void agregarProducto(Producto producto) {
-        String sql = "{call pkg_productos.crear_producto(?, ?, ?, ?, ?, ?, ?, ?)}";
+        String sql = "{call pkg_productos.crear_producto(?, ?, ?, ?, ?, ?, ?)}";
         jdbcTemplate.update(sql, 
-            producto.getId_Producto(), 
             producto.getNombre(), 
             producto.getDescripcion(),
             producto.getPrecio().doubleValue(), 

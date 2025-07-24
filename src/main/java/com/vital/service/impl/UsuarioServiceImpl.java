@@ -24,9 +24,8 @@ public List<Usuario> getUsuarios() {
     }
 @Transactional
     public void agregarUsuario(Usuario usuario) {
-        String sql = "{call pkg_usuarios.crear_usuario(?, ?, ?, ?, ?, ?, ?)}";
+        String sql = "{call pkg_usuarios.crear_usuario(?, ?, ?, ?, ?, ?)}";
         jdbcTemplate.update(sql, 
-            usuario.getId_Usuario(), 
             usuario.getNombre(),
             usuario.getCorreo(),
             usuario.getContrasena(),

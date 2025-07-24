@@ -14,34 +14,39 @@
       
       <h2>Modoficar Usuario</h2>
    <form th:action="@{/actualizarUsuario}" th:object="${usuario}" method="post">
+       
+    <div>
+        <label for="id_usuario">ID:</label>
+        <input type="number" th:field="*{id_Usuario}" id="id_Isuario" readonly="true" />
+    </div> 
    <div>
         <label for="nombre">Nombre:</label>
-        <input type="text" th:field="*{nombre}" id="nombre" required />
+        <input type="text" th:field="*{nombre}" id="nombre"  />
     </div> 
        
      <div>
         <label for="correo">Correo Electronico:</label>
-        <input type="email" th:field="*{correo}" id="correo" required />
+        <input type="email" th:field="*{correo}" id="correo"  />
     </div> 
        
     <div>
         <label for="contrasena">Contraseña:</label>
-        <input type="password" th:field="*{contrasena}" id="contrasena" required />
+        <input type="password" th:field="*{contrasena}" id="contrasena"  />
     </div> 
        
     <div>
         <label for="direccion">Direccion:</label>
-        <input type="text" th:field="*{direccion}" id="direccion" required />
+        <input type="text" th:field="*{direccion}" id="direccion"  />
     </div> 
        
     <div>
         <label for="telefono">Telefono:</label>
-        <input type="text" th:field="*{telefono}" id="telefono" required />
+        <input type="text" th:field="*{telefono}" id="telefono" />
     </div> 
        
     <div>
         <label for="role">Rol:</label>
-        <input type="text" th:field="*{role}" id="role" required />
+        <input type="text" th:field="*{role}" id="role" />
     </div>
 
     <div>

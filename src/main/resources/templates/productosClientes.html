@@ -31,7 +31,9 @@
                         <td th:text="${producto.nombre}"></td>
                         <td th:text="${producto.descripcion}"></td>
                         <td th:text="${producto.precio}"></td>
-                        <td th:text="${producto.url_imagen}"></td>
+                        <td>
+                          <img th:src="@{${producto.url_imagen}}" alt="Imagen del producto" class="img-fluid" style="max-height: 400px;" />  
+                        </td>
                         <td th:text="${producto.id_categoria}"></td>
                         <td th:text="${producto.id_tipo_prenda}"></td>
                         <td class="text-center">
