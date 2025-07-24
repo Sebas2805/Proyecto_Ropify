@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+    xmlns="http://www.w3.org/1999/xhtml%22">
+    
+    <head th:replace="~{layout/plantilla :: head}">
+        <title>FidExpress</title>
+        <meta charset="UTF-8"/>
+        <link href="css/estilos.css" rel="stylesheet" type="text/css"/>
+
+    </head>
+    <body>
+        <header th:replace="layout/plantilla::header" />
+        <br>
+     <div class="container mt-3">
+  <h2>Menu Administradores</h2>
+  <div class="list-group">
+    <a th:href="@{/productos}" class="list-group-item list-group-item-action">Productos</a>
+    <a th:href="@{/usuarios}" class="list-group-item list-group-item-action">Usuarios</a>
+
+  </div>
+</div>
+    
+ 
+         
+                 <footer th:replace="layout/plantilla::footer" />
+     </body>
+</html>

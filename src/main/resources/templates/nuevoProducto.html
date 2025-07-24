@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+    xmlns="http://www.w3.org/1999/xhtml%22">
+    
+    <head th:replace="~{layout/plantilla :: head}">
+        <title>FidExpress</title>
+        <meta charset="UTF-8"/>
+        <link href="css/estilos.css" rel="stylesheet" type="text/css"/>
+
+    </head>
+    <body>
+      <header th:replace="layout/plantilla::header" />
+      
+      <h2>Agregar Nuevo Producto</h2>
+   <form th:action="@{/guardarProducto}" th:object="${producto}" method="post">
+    <div>
+        <label for="nombre">Nombre del Producto:</label>
+        <input type="text" th:field="*{nombre}" id="nombre" required />
+    </div>
+       
+    <div>
+        <label for="descripcion">Descripcion del Producto:</label>
+        <input type="text" th:field="*{descripcion}" id="descripcion" required />
+    </div>
+
+    <div>
+        <label for="precio">Precio:</label>
+        <input type="number" step="0.01" th:field="*{precio}" id="precio" required />
+    </div>
+
+    <div>
+        <label for="stock">Stock:</label>
+        <input type="number" th:field="*{stock_minimo}" id="stock" required />
+    </div>
+       
+
+   
+
+    <div>
+        <button type="submit">Guardar</button>
+    </div>
+</form>
+      
+      
+      <footer th:replace="layout/plantilla::footer" />
+    </body>
+</html>

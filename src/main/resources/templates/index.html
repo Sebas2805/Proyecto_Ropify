@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout/plantilla :: head}">
+    <title>FidExpress</title>
+    <meta charset="UTF-8"/>
+    <link href="css/estilos.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+    <header th:replace="layout/plantilla::header" />
+    
+    <!-- Banner Principal -->
+    <div class="banner">
+        <img src="images/banner-promocion.jpg" alt="Descuento Especial" class="img-fluid"/>
+        <div class="banner-text">
+            <h1>¡Grandes Descuentos Este Fin De Semana!</h1>
+            <p>Disfruta de ofertas irresistibles en tus productos favoritos.</p>
+            <a href="#" class="btn btn-primary">Ver Ofertas</a>
+        </div>
+    </div>
+    
+    <br>
+    
+    <!-- Categorías Populares -->
+    <h2 class="titulo">Categorías Populares</h2>
+    <div class="categories">
+        <div class="category-card">
+            <img src="images/category-electronica.jpg" alt="Hoodie" class="img-fluid"/>
+            <h3>Hoodies</h3>
+            <a href="#">Ver más</a>
+        </div>
+        <div class="category-card">
+            <img src="images/category-ropa.jpg" alt="Camisa" class="img-fluid"/>
+            <h3>Camisas</h3>
+            <a href="#">Ver más</a>
+        </div>
+        <div class="category-card">
+            <img src="images/category-hogar.jpg" alt="Pantalon" class="img-fluid"/>
+            <h3>Pantalones</h3>
+            <a href="#">Ver más</a>
+        </div>
+    </div>
+    
+    <br>
+    
+    <!-- Productos Destacados -->
+    <h2 class="titulo">Productos Destacados</h2>
+    <div class="featured-products">
+        <div class="product-card">
+            <img src="images/product1.jpg" alt="Producto 1" class="img-fluid"/>
+            <h3>Nombre Producto</h3>
+            <p>Descripción corta del producto.</p>
+            <a href="#" class="btn btn-success">Añadir al carrito</a>
+        </div>
+        <div class="product-card">
+            <img src="images/product2.jpg" alt="Producto 2" class="img-fluid"/>
+            <h3>Nombre Producto</h3>
+            <p>Descripción corta del producto.</p>
+            <a href="#" class="btn btn-success">Añadir al carrito</a>
+        </div>
+        <div class="product-card">
+            <img src="images/product3.jpg" alt="Producto 3" class="img-fluid"/>
+            <h3>Nombre Producto</h3>
+            <p>Descripción corta del producto.</p>
+            <a href="#" class="btn btn-success">Añadir al carrito</a>
+        </div>
+    </div>
+    
+    <br>
+    
+    <!-- Testimonios -->
+    <h2 class="titulo">Testimonios de Clientes</h2>
+    <div class="testimonials">
+        <div class="testimonial-card">
+            <p>"¡Excelente servicio y productos de calidad! Estoy muy contento con mi compra."</p>
+            <p>- Cliente Satisfecho</p>
+        </div>
+        <div class="testimonial-card">
+            <p>"Rápido, fácil y confiable. Definitivamente volveré a comprar aquí."</p>
+            <p>- Cliente Feliz</p>
+        </div>
+    </div>
+
+    <br>
+    
+   
+
+    <footer th:replace="layout/plantilla::footer" />
+</body>
+
+</html>

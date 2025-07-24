@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org"
+    xmlns="http://www.w3.org/1999/xhtml%22">
+    
+    <head th:replace="~{layout/plantilla :: head}">
+        <title>FidExpress</title>
+        <meta charset="UTF-8"/>
+        <link href="css/estilos.css" rel="stylesheet" type="text/css"/>
+
+    </head>
+    <body>
+      <header th:replace="layout/plantilla::header" />
+      
+      <h2>Modoficar Usuario</h2>
+   <form th:action="@{/actualizarUsuario}" th:object="${usuario}" method="post">
+   <div>
+        <label for="nombre">Nombre:</label>
+        <input type="text" th:field="*{nombre}" id="nombre" required />
+    </div> 
+       
+     <div>
+        <label for="correo">Correo Electronico:</label>
+        <input type="email" th:field="*{correo}" id="correo" required />
+    </div> 
+       
+    <div>
+        <label for="contrasena">Contraseña:</label>
+        <input type="password" th:field="*{contrasena}" id="contrasena" required />
+    </div> 
+       
+    <div>
+        <label for="direccion">Direccion:</label>
+        <input type="text" th:field="*{direccion}" id="direccion" required />
+    </div> 
+       
+    <div>
+        <label for="telefono">Telefono:</label>
+        <input type="text" th:field="*{telefono}" id="telefono" required />
+    </div> 
+       
+    <div>
+        <label for="role">Rol:</label>
+        <input type="text" th:field="*{role}" id="role" required />
+    </div>
+
+    <div>
+        <button type="submit">Guardar</button>
+    </div>
+</form>
+      
+      
+      <footer th:replace="layout/plantilla::footer" />
+    </body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+
+<head th:replace="~{layout/plantilla :: head}">
+    <title>FidExpress</title>
+    <meta charset="UTF-8"/>
+    <link href="css/estilos.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body>
+    <header th:replace="layout/plantilla::header"></header>
+
+    <div class="container mt-5">
+        <h1 class="titulo mb-4">Usuarios</h1>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover table-striped align-middle shadow">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>ID Usuario</th>  
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Contraseña</th>
+                        <th>Direccion</th>
+                        <th>Telefono</th>
+                        <th>Rol</th>
+                        <th colspan="2">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="usuario : ${usuarios}">
+                        <td th:text="${usuario.id_Usuario}"></td>
+                        <td th:text="${usuario.nombre}"></td>
+                        <td th:text="${usuario.correo}"></td>
+                        <td th:text="${usuario.contrasena}"></td>
+                        <td th:text="${usuario.direccion}"></td>
+                        <td th:text="${usuario.telefono}"></td>
+                        <td th:text="${usuario.role}"></td>
+                        <td class="text-center">
+                            <a th:href="@{/modificarUsuario/{idUsuario}(idUsuario=${usuario.id_Usuario})}" class="btn btn-sm btn-primary">Actualizar</a>
+                        </td>
+                        <td class="text-center">
+                            <a th:href="@{/eliminarUsuario/{idUsuario}(idUsuario=${usuario.id_Usuario})}" class="btn btn-sm btn-danger">Eliminar</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-end mt-3">
+            <a th:href="@{/nuevoUsuario}" class="btn btn-success">Nuevo Usuario</a>
+        </div>
+    </div>
+
+    <footer th:replace="layout/plantilla::footer"></footer>
+</body>
+</html>

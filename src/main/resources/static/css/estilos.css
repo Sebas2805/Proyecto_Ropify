@@ -1,0 +1,262 @@
+.nav-color{
+    background-color: #072326;
+}
+.text-color{
+    color: #54BFB5;
+}
+.titulo{
+    color: #072326;
+    text-align: center;
+
+}
+.sub-titulo{
+    color: #54BFB5;
+    text-align: center;
+
+}
+.display {
+    display: flex;
+   justify-content: center;
+}
+table{
+    margin-left: 20px;
+}
+.table thead {
+    background-color: #072326;
+    color: #ffffff;
+}
+
+.btn-outline-primary {
+    border-color: #54BFB5;
+    color: #54BFB5;
+}
+
+.btn-outline-primary:hover {
+    background-color: #54BFB5;
+    color: #fff;
+}
+
+.btn-success {
+    background-color: #54BFB5;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #3aa49a;
+}
+
+.titulo {
+    font-weight: bold;
+    font-size: 2rem;
+}
+table td, table th {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+/* Header */
+header {
+    background-color: #072326;
+    padding: 20px;
+    text-align: center;
+    color: #fff;
+}
+
+/* Títulos */
+.titulo {
+    color: #072326;
+    text-align: center;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.sub-titulo {
+    color: #54BFB5;
+    text-align: center;
+    font-size: 1.2em;
+    margin-bottom: 30px;
+}
+
+/* Banner */
+.banner {
+    position: relative;
+    width: 100%;
+    max-height: 400px;
+    overflow: hidden;
+}
+
+.banner img {
+    width: 100%;
+    height: auto;
+}
+
+.banner-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+}
+
+.banner-text h1 {
+    font-size: 2.5em;
+    margin: 0;
+}
+
+.banner-text p {
+    font-size: 1.2em;
+    margin-top: 10px;
+}
+
+.banner-text .btn {
+    margin-top: 20px;
+    background-color: #54BFB5;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 1.2em;
+    border-radius: 5px;
+}
+
+/* Categorías */
+.categories {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
+}
+
+.category-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    width: 25%;
+}
+
+.category-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.category-card h3 {
+    font-size: 1.5em;
+    color: #072326;
+    margin-top: 15px;
+}
+
+.category-card a {
+    text-decoration: none;
+    color: #54BFB5;
+    font-size: 1.2em;
+    margin-top: 10px;
+    display: inline-block;
+}
+
+.category-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Productos Destacados */
+.featured-products {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.product-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 30%;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.product-card h3 {
+    font-size: 1.5em;
+    color: #072326;
+    margin-top: 15px;
+}
+
+.product-card p {
+    font-size: 1.1em;
+    color: #444;
+    margin-top: 10px;
+}
+
+.product-card .btn {
+    background-color: #54BFB5;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 1.2em;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Testimonios */
+.testimonials {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
+}
+
+.testimonial-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 45%;
+    margin-bottom: 20px;
+    font-style: italic;
+    text-align: center;
+}
+
+.testimonial-card p {
+    font-size: 1.2em;
+    color: #444;
+}
+
+.testimonial-card h3 {
+    font-size: 1.1em;
+    color: #072326;
+    margin-top: 15px;
+}
+/* Footer */
+footer {
+    background-color: #072326;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    margin-top: 50px;
+}
