@@ -21,7 +21,9 @@ void actualizarUsuario(Usuario usuario);
 
 String eliminarUsuario(int idUsuario);
 
+void registrarUsuario(String nombre, String correo, String contrasena, String direccion, String telefono, String role);
 
+public Integer IniciarSesion(String correo, String contrasena);
 
 
 }
