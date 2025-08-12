@@ -1,6 +1,7 @@
 
 package com.vital.service;
 
+import com.vital.DTO.ResumenUsuarioCompraFile;
 import com.vital.domain.Usuario;
 import java.util.List;
 
@@ -17,13 +18,15 @@ void agregarUsuario(Usuario usuario);
 Usuario getUsuario(int idUsuario);
  
 // Método para actualizar un producto utilizando el procedimiento almacenado
-void actualizarUsuario(Usuario usuario);
+boolean actualizarUsuario(Usuario usuario);
 
 String eliminarUsuario(int idUsuario);
 
 void registrarUsuario(String nombre, String correo, String contrasena, String direccion, String telefono, String role);
 
-public Integer IniciarSesion(String correo, String contrasena);
+public Usuario IniciarSesion(String correo, String contrasena);
+
+List<ResumenUsuarioCompraFile> obtenerComprasPorUsuario(Integer idUsuario);
 
 
 }

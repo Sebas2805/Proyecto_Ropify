@@ -38,7 +38,7 @@
                         <td th:text="${usuario.telefono}"></td>
                         <td th:text="${usuario.role}"></td>
                         <td class="text-center">
-                            <a th:href="@{/modificarUsuario/{idUsuario}(idUsuario=${usuario.id_Usuario})}" class="btn btn-sm btn-primary">Actualizar</a>
+                            <a th:href="@{/usuario/actualizar/{idUsuario}(idUsuario=${usuario.id_Usuario})}" class="btn btn-sm btn-primary">Actualizar</a>
                         </td>
                         <td class="text-center">
                             <a th:href="@{/eliminarUsuario/{idUsuario}(idUsuario=${usuario.id_Usuario})}" class="btn btn-sm btn-danger">Eliminar</a>

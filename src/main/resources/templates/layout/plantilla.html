@@ -32,12 +32,17 @@
                                 <a class="nav-menu-link nav-link text-color" th:href="@{/admin}">Admin</a>
                             </li>
                         </ul>
-                        <ul class="navbar-nav ms-auto">
+                        <ul class="navbar-nav ms-auto" th:if="${session.usuario == null}">
                             <li class="nav-item px-2">
                                 <a class="nav-menu-link nav-link text-color" th:href="@{/usuario/registrar}">Registro</a>
                             </li>
                             <li class="nav-item px-2">
                                 <a class="nav-menu-link nav-link text-color" th:href="@{/usuario/nuevoInicioSesion}">Inicio Sesion</a>
+                            </li>
+                        </ul>
+                        <ul class="navbar-nav ms-auto" th:if="${session.usuario != null}">
+                            <li class="nav-item px-2">
+                                <a class="nav-menu-link nav-link text-color" th:href="@{/usuario/menu}">Perfil</a>
                             </li>
                         </ul>
                     </div>

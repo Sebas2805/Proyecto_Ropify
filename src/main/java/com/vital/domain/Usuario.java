@@ -28,7 +28,8 @@ public class Usuario implements Serializable {
     public Usuario() {
     }
 
-    public Usuario(String nombre, String correo, String contrasena, String direccion, String telefono, String role) {
+    public Usuario(int id_Usuario,String nombre, String correo, String contrasena, String direccion, String telefono, String role) {
+        this.id_Usuario = id_Usuario;
         this.nombre = nombre;
         this.correo = correo;
         this.contrasena = contrasena;

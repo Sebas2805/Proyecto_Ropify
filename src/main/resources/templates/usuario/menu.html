@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{layout/plantilla :: head}">
+        <title>FidExpress</title>
+        <meta charset="UTF-8"/>
+        <link href="css/estilos.css" rel="stylesheet" type="text/css"/>
+
+
+    </head>
+    <body class="bg-light">
+        <header th:replace="layout/plantilla::header"></header>
+        
+        <div class="container mt-3">
+            <h2>Opciones de usuario</h2>
+            <p>Aquí se accede a las procedimientos del paquete de usuarios</p>
+            <div class="list-group">
+                <a th:href="@{/usuario/listado_usuario_id}" class="list-group-item list-group-item-action">Obtener usuario por ID</a>
+                <a th:href="@{/usuario/compras}" class="list-group-item list-group-item-action">Obtener mis compras</a>
+
+            </div>
+        </div>
+        
+        <footer th:replace="layout/plantilla::footer"></footer>
+    </body>
+</html>

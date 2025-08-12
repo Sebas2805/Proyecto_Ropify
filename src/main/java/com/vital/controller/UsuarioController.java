@@ -1,8 +1,10 @@
 package com.vital.controller;
 
+import com.vital.DTO.ResumenUsuarioCompraFile;
 import com.vital.domain.Usuario;
 import com.vital.service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -50,15 +52,64 @@ public class UsuarioController {
             @RequestParam String contrasena,
             HttpSession session,
             Model model) {
-        Integer idUsuario = usuarioService.IniciarSesion(correo, contrasena);
+        Usuario usuario = usuarioService.IniciarSesion(correo, contrasena);
 
-        if (idUsuario != null) {
-            session.setAttribute("usuarioId", idUsuario);
+        if (usuario != null) {
+            session.setAttribute("usuario", usuario);
             return "redirect:/";
         } else {
             model.addAttribute("error", "Correo o contraseña incorrectos");
             return "/usuario/InicioSesion";
         }
+    }
+    
+    @GetMapping("/menu")
+    public String mostrarMenuUsuarios(HttpSession session,Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        model.addAttribute("usuario", usuario);
+        return "/usuario/menu";
+    }
+    
+    @GetMapping("/compras")
+    public String mostrarCompras(HttpSession session,Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        if (usuario == null) {
+            return "redirect:/usuario/login";
+        }
+
+        List<ResumenUsuarioCompraFile> ventas = usuarioService.obtenerComprasPorUsuario(usuario.getId_Usuario());
+        model.addAttribute("ventas", ventas);
+        model.addAttribute("usuarioNombre", usuario.getNombre());
+        return "/usuario/compras";
+    }
+    
+    @GetMapping("/listadoId")
+    public String mostrarListadoId(HttpSession session,Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        model.addAttribute("usuario", usuario);
+        return "/usuario/listado_usuario_id";
+    }
+    
+    @GetMapping("/actualizar/{idUsuario}")
+    public String mostrarFormularioActualizar(@PathVariable("idUsuario") int idUsuario, Model model) {
+        Usuario usuario = usuarioService.getUsuario(idUsuario); // Lo obtienes de DB
+        if (usuario == null) {
+
+            return "redirect:/usuarios";
+        }
+        model.addAttribute("usuario", usuario); 
+        return "/usuario/actualizar"; 
+    }
+    
+    @PostMapping("/actualizar/aplicar")
+    public String actualizar(@ModelAttribute("usuario") Usuario usuario, RedirectAttributes ra) {
+        boolean exito = usuarioService.actualizarUsuario(usuario);
+        if (exito) {
+            ra.addFlashAttribute("msg", "Usuario actualizado correctamente!");
+        } else {
+            ra.addFlashAttribute("error", "No se encontró el usuario a actualizar");
+        }
+        return "redirect:/usuario/usuarios";
     }
 
     /// Fin nuevo codigo
