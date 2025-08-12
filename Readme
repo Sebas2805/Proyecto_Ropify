@@ -1,0 +1,1022 @@
+-- Tabla usuarios
+CREATE TABLE USUARIOS (
+    ID_USUARIO NUMBER PRIMARY KEY,
+    NOMBRE VARCHAR2(100),
+    CORREO VARCHAR2(100) UNIQUE NOT NULL,
+    CONTRASENA VARCHAR2(100) NOT NULL,
+    DIRECCION VARCHAR2(200),
+    TELEFONO VARCHAR2(20),
+    ROLE VARCHAR2(50) DEFAULT 'cliente' -- 'cliente', 'admin', etc.
+);
+
+-- Tabla categoria (dama, caballero, etc.)
+CREATE TABLE CATEGORIAS (
+    ID_CATEGORIA NUMBER PRIMARY KEY,
+    NOMBRE VARCHAR2(50) UNIQUE NOT NULL
+);
+
+-- Tabla de tipo de prendas (camisa, pantalones, etc)
+CREATE TABLE TIPO_PRENDAS (
+    ID_TIPO_PRENDA NUMBER PRIMARY KEY,
+    NOMBRE VARCHAR2(50) UNIQUE NOT NULL
+);
+
+-- Tabla productos
+CREATE TABLE PRODUCTOS (
+    ID_PRODUCTO NUMBER PRIMARY KEY,
+    NOMBRE VARCHAR2(100) NOT NULL,
+    DESCRIPCION VARCHAR2(500),
+    PRECIO NUMBER(10,2) NOT NULL,
+    STOCK_MINIMO NUMBER NOT NULL,
+    URL_IMAGEN VARCHAR2(255),
+    ID_CATEGORIA NUMBER,
+    ID_TIPO_PRENDA NUMBER,
+    FOREIGN KEY (ID_CATEGORIA) REFERENCES CATEGORIAS(ID_CATEGORIA),
+    FOREIGN KEY (ID_TIPO_PRENDA) REFERENCES TIPO_PRENDAS(ID_TIPO_PRENDA)
+);
+
+-- Tabla inventario
+CREATE TABLE INVENTARIO (
+    ID_INVENTARIO NUMBER PRIMARY KEY,
+    ID_PRODUCTO NUMBER NOT NULL,
+    STOCK_ACTUAL NUMBER NOT NULL,
+    FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTOS(ID_PRODUCTO)
+);
+
+-- Tabla carritos
+CREATE TABLE CARRITOS (
+    ID_CARRITO NUMBER PRIMARY KEY,
+    ID_USUARIO NUMBER NOT NULL,
+    FECHA_CREACION DATE DEFAULT SYSDATE,
+    ESTADO VARCHAR2(20) DEFAULT 'Abierto', -- Abierto, Cerrado
+    FOREIGN KEY (ID_USUARIO) REFERENCES USUARIOS(ID_USUARIO)
+);
+
+-- Detalle del carrito
+CREATE TABLE CARRITO_DETALLE (
+    ID_DETALLE NUMBER PRIMARY KEY,
+    ID_CARRITO NUMBER NOT NULL,
+    ID_PRODUCTO NUMBER NOT NULL,
+    CANTIDAD NUMBER NOT NULL,
+    FOREIGN KEY (ID_CARRITO) REFERENCES CARRITOS(ID_CARRITO),
+    FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTOS(ID_PRODUCTO)
+);
+
+-- Tabla ventas
+CREATE TABLE VENTAS (
+    ID_VENTA NUMBER PRIMARY KEY,
+    ID_USUARIO NUMBER NOT NULL,
+    FECHA_VENTA DATE DEFAULT SYSDATE,
+    MONTO_TOTAL NUMBER(10,2),
+    FOREIGN KEY (ID_USUARIO) REFERENCES USUARIOS(ID_USUARIO)
+);
+
+-- detalle de ventas
+CREATE TABLE DETALLE_VENTAS (
+    ID_DETALLE NUMBER PRIMARY KEY,
+    ID_VENTA NUMBER NOT NULL,
+    ID_PRODUCTO NUMBER NOT NULL,
+    CANTIDAD NUMBER NOT NULL,
+    PRECIO_UNITARIO NUMBER(10,2),
+    FOREIGN KEY (ID_VENTA) REFERENCES VENTAS(ID_VENTA),
+    FOREIGN KEY (ID_PRODUCTO) REFERENCES PRODUCTOS(ID_PRODUCTO)
+);
+
+
+-----------------------------------------
+Secuecias
+-----------------------------------------
+CREATE SEQUENCE SEQ_USUARIOS START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE SEQ_CATEGORIAS START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE SEQ_TIPO_PRENDAS START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE SEQ_PRODUCTOS START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE SEQ_INVENTARIO START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE SEQ_CARRITOS START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE SEQ_CARRITO_DETALLE START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE SEQ_VENTAS START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+CREATE SEQUENCE SEQ_DETALLE_VENTAS START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
+
+
+-----------------------------------------
+Triggers para auto generar la ID de cada tabla
+-----------------------------------------
+CREATE OR REPLACE TRIGGER TRG_USUARIOS
+BEFORE INSERT ON USUARIOS
+FOR EACH ROW
+BEGIN
+    :NEW.ID_USUARIO := SEQ_USUARIOS.NEXTVAL;
+END;
+
+CREATE OR REPLACE TRIGGER TRG_CATEGORIAS
+BEFORE INSERT ON CATEGORIAS
+FOR EACH ROW
+BEGIN
+    :NEW.ID_CATEGORIA := SEQ_CATEGORIAS.NEXTVAL;
+END;
+
+CREATE OR REPLACE TRIGGER TRG_TIPO_PRENDAS
+BEFORE INSERT ON TIPO_PRENDAS
+FOR EACH ROW
+BEGIN
+    :NEW.ID_TIPO_PRENDA := SEQ_TIPO_PRENDAS.NEXTVAL;
+END;
+
+CREATE OR REPLACE TRIGGER TRG_PRODUCTOS
+BEFORE INSERT ON PRODUCTOS
+FOR EACH ROW
+BEGIN
+    :NEW.ID_PRODUCTO := SEQ_PRODUCTOS.NEXTVAL;
+END;
+
+CREATE OR REPLACE TRIGGER TRG_INVENTARIO
+BEFORE INSERT ON INVENTARIO
+FOR EACH ROW
+BEGIN
+    :NEW.ID_INVENTARIO := SEQ_INVENTARIO.NEXTVAL;
+END;
+
+CREATE OR REPLACE TRIGGER TRG_CARRITOS
+BEFORE INSERT ON CARRITOS
+FOR EACH ROW
+BEGIN
+    :NEW.ID_CARRITO := SEQ_CARRITOS.NEXTVAL;
+END;
+
+CREATE OR REPLACE TRIGGER TRG_CARRITO_DETALLE
+BEFORE INSERT ON CARRITO_DETALLE
+FOR EACH ROW
+BEGIN
+    :NEW.ID_DETALLE := SEQ_CARRITO_DETALLE.NEXTVAL;
+END;
+
+CREATE OR REPLACE TRIGGER TRG_VENTAS
+BEFORE INSERT ON VENTAS
+FOR EACH ROW
+BEGIN
+    :NEW.ID_VENTA := SEQ_VENTAS.NEXTVAL;
+END;
+
+CREATE OR REPLACE TRIGGER TRG_DETALLE_VENTAS
+BEFORE INSERT ON DETALLE_VENTAS
+FOR EACH ROW
+BEGIN
+    :NEW.ID_DETALLE := SEQ_DETALLE_VENTAS.NEXTVAL;
+END;
+
+-----------------------------------------
+
+DROP TRIGGER TRG_CORREO_UNICO;
+
+--- Vista usuarios y compras
+
+CREATE OR REPLACE VIEW V_Resumen_Usuarios_Compras AS
+SELECT 
+    u.ID_USUARIO,
+    u.NOMBRE,
+    u.CORREO,
+    v.ID_VENTA,
+    v.FECHA_VENTA,
+    v.MONTO_TOTAL,
+    NVL(SUM(dv.CANTIDAD), 0) AS CANTIDAD_ARTICULOS
+FROM USUARIOS u
+JOIN VENTAS v 
+  ON u.ID_USUARIO = v.ID_USUARIO
+LEFT JOIN DETALLE_VENTAS dv
+  ON v.ID_VENTA = dv.ID_VENTA
+GROUP BY 
+    u.ID_USUARIO, u.NOMBRE, u.CORREO,
+    v.ID_VENTA, v.FECHA_VENTA, v.MONTO_TOTAL
+ORDER BY v.FECHA_VENTA DESC;
+
+--- trigger para asegurar que todos los correos sean unicos
+
+CREATE OR REPLACE TRIGGER TRG_Correo_Unico
+BEFORE INSERT OR UPDATE ON USUARIOS
+FOR EACH ROW
+DECLARE
+    v_contador NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO v_contador
+    FROM USUARIOS
+    WHERE CORREO = :NEW.CORREO
+      AND ID_USUARIO != NVL(:NEW.ID_USUARIO, -1);
+
+    IF v_contador > 0 THEN
+        RAISE_APPLICATION_ERROR(-20002, 'El correo ya ha sido registrado');
+    END IF;
+END;
+-------------------
+Paquete de usuarios
+-------------------
+
+
+CREATE OR REPLACE PACKAGE PKG_USUARIO AS
+    PROCEDURE REGISTRAR_USUARIO (
+        p_nombre     IN VARCHAR2,
+        p_correo     IN VARCHAR2,
+        p_contrasena IN VARCHAR2,
+        p_direccion  IN VARCHAR2,
+        p_telefono   IN VARCHAR2,
+        p_rol        IN VARCHAR2
+    );
+
+    PROCEDURE INICIAR_SESION (
+        p_correo     IN VARCHAR2,
+        p_contrasena IN VARCHAR2,
+        p_cursor     OUT SYS_REFCURSOR
+    );
+
+    PROCEDURE ACTUALIZAR_USUARIO (
+        p_usuario_id IN NUMBER,
+        p_nombre     IN VARCHAR2,
+        p_correo     IN VARCHAR2,
+        p_contrasena IN VARCHAR2,
+        p_direccion  IN VARCHAR2,
+        p_telefono   IN VARCHAR2
+    );
+
+    PROCEDURE OBTENER_USUARIO_POR_ID (
+        p_usuario_id IN NUMBER,
+        p_cursor     OUT SYS_REFCURSOR
+    );
+
+    PROCEDURE Obtener_Compras_Por_Usuario(
+        p_usuario_id IN NUMBER,
+        p_cursor OUT SYS_REFCURSOR
+    );
+END PKG_USUARIO;
+
+select * from detalle_ventas;
+----Cuerpo de paquete
+
+CREATE OR REPLACE PACKAGE BODY PKG_USUARIO AS
+
+PROCEDURE REGISTRAR_USUARIO (
+    p_nombre     IN VARCHAR2,
+    p_correo     IN VARCHAR2,
+    p_contrasena IN VARCHAR2,
+    p_direccion  IN VARCHAR2,
+    p_telefono   IN VARCHAR2,
+    p_rol        IN VARCHAR2
+) IS
+BEGIN
+    INSERT INTO USUARIOS (
+        NOMBRE,
+        CORREO,
+        CONTRASENA,
+        DIRECCION,
+        TELEFONO,
+        ROLE
+    ) VALUES (
+        p_nombre,
+        p_correo,
+        p_contrasena,
+        p_direccion,
+        p_telefono,
+        p_rol
+    );
+END REGISTRAR_USUARIO;
+
+PROCEDURE INICIAR_SESION (
+    p_correo     IN VARCHAR2,
+    p_contrasena IN VARCHAR2,
+    p_cursor     OUT SYS_REFCURSOR
+) IS
+BEGIN
+    OPEN p_cursor FOR
+        SELECT *
+        FROM USUARIOS
+        WHERE CORREO = p_correo
+          AND CONTRASENA = p_contrasena;
+END INICIAR_SESION;
+
+PROCEDURE ACTUALIZAR_USUARIO (
+    p_usuario_id IN NUMBER,
+    p_nombre     IN VARCHAR2,
+    p_correo     IN VARCHAR2,
+    p_contrasena IN VARCHAR2,
+    p_direccion  IN VARCHAR2,
+    p_telefono   IN VARCHAR2
+) IS
+BEGIN
+    UPDATE USUARIOS
+       SET NOMBRE     = p_nombre,
+           CORREO     = p_correo,
+           CONTRASENA = p_contrasena,
+           DIRECCION  = p_direccion,
+           TELEFONO   = p_telefono
+     WHERE ID_USUARIO = p_usuario_id;
+END ACTUALIZAR_USUARIO;
+
+PROCEDURE OBTENER_USUARIO_POR_ID (
+    p_usuario_id IN NUMBER,
+    p_cursor     OUT SYS_REFCURSOR
+) IS
+BEGIN
+    OPEN p_cursor FOR
+        SELECT *
+        FROM USUARIOS
+        WHERE ID_USUARIO = p_usuario_id;
+END OBTENER_USUARIO_POR_ID;
+
+PROCEDURE Obtener_Compras_Por_Usuario(
+    p_usuario_id IN NUMBER,
+    p_cursor OUT SYS_REFCURSOR
+) IS
+BEGIN
+    OPEN p_cursor FOR
+        SELECT *
+        FROM V_Resumen_Usuarios_Compras
+        WHERE ID_Usuario = p_usuario_id;
+END Obtener_Compras_Por_Usuario;
+
+END PKG_USUARIO;
+
+
+SELECT * FROM usuarios;
+DELETE FROM USUARIOS WHERE ID_USUARIO = 2;
+-------------------------------------------------------
+--Crud Productos
+-------------------------------------------------------
+
+CREATE OR REPLACE PACKAGE pkg_productos IS
+    -- Crear producto
+    PROCEDURE crear_producto(
+        p_nombre         IN PRODUCTOS.NOMBRE%TYPE,
+        p_descripcion    IN PRODUCTOS.DESCRIPCION%TYPE,
+        p_precio         IN PRODUCTOS.PRECIO%TYPE,
+        p_stock_minimo   IN PRODUCTOS.STOCK_MINIMO%TYPE,
+        p_url_imagen     IN PRODUCTOS.URL_IMAGEN%TYPE,
+        p_id_categoria   IN PRODUCTOS.ID_CATEGORIA%TYPE,
+        p_id_tipo_prenda IN PRODUCTOS.ID_TIPO_PRENDA%TYPE
+    );
+
+    -- Consultar producto por ID
+    PROCEDURE consultar_producto(
+        p_id_producto IN PRODUCTOS.ID_PRODUCTO%TYPE
+    );
+
+    -- Actualizar producto
+    PROCEDURE actualizar_producto(
+        p_id_producto     IN PRODUCTOS.ID_PRODUCTO%TYPE,
+        p_nombre          IN PRODUCTOS.NOMBRE%TYPE,
+        p_descripcion     IN PRODUCTOS.DESCRIPCION%TYPE,
+        p_precio          IN PRODUCTOS.PRECIO%TYPE,
+        p_stock_minimo    IN PRODUCTOS.STOCK_MINIMO%TYPE,
+        p_url_imagen      IN PRODUCTOS.URL_IMAGEN%TYPE,
+        p_id_categoria    IN PRODUCTOS.ID_CATEGORIA%TYPE,
+        p_id_tipo_prenda  IN PRODUCTOS.ID_TIPO_PRENDA%TYPE
+    );
+
+    -- Eliminar producto
+    PROCEDURE eliminar_producto(
+        p_id_producto IN PRODUCTOS.ID_PRODUCTO%TYPE
+    );
+END pkg_productos;
+
+------------------------------------------------------------
+
+CREATE OR REPLACE PACKAGE BODY pkg_productos IS
+
+    PROCEDURE crear_producto(
+        p_nombre         IN PRODUCTOS.NOMBRE%TYPE,
+        p_descripcion    IN PRODUCTOS.DESCRIPCION%TYPE,
+        p_precio         IN PRODUCTOS.PRECIO%TYPE,
+        p_stock_minimo   IN PRODUCTOS.STOCK_MINIMO%TYPE,
+        p_url_imagen     IN PRODUCTOS.URL_IMAGEN%TYPE,
+        p_id_categoria   IN PRODUCTOS.ID_CATEGORIA%TYPE,
+        p_id_tipo_prenda IN PRODUCTOS.ID_TIPO_PRENDA%TYPE
+    ) IS
+    BEGIN
+        INSERT INTO PRODUCTOS (
+            NOMBRE, DESCRIPCION, PRECIO, STOCK_MINIMO,
+            URL_IMAGEN, ID_CATEGORIA, ID_TIPO_PRENDA
+        ) VALUES (
+            p_nombre, p_descripcion, p_precio, p_stock_minimo,
+            p_url_imagen, p_id_categoria, p_id_tipo_prenda
+        );
+    END;
+
+    PROCEDURE consultar_producto(
+        p_id_producto IN PRODUCTOS.ID_PRODUCTO%TYPE
+    ) IS
+        v_producto PRODUCTOS%ROWTYPE;
+    BEGIN
+        SELECT * INTO v_producto
+        FROM PRODUCTOS
+        WHERE ID_PRODUCTO = p_id_producto;
+
+        DBMS_OUTPUT.PUT_LINE('ID: ' || v_producto.ID_PRODUCTO);
+        DBMS_OUTPUT.PUT_LINE('Nombre: ' || v_producto.NOMBRE);
+        DBMS_OUTPUT.PUT_LINE('Descripci�n: ' || v_producto.DESCRIPCION);
+        DBMS_OUTPUT.PUT_LINE('Precio: ' || v_producto.PRECIO);
+        DBMS_OUTPUT.PUT_LINE('Stock m�nimo: ' || v_producto.STOCK_MINIMO);
+        DBMS_OUTPUT.PUT_LINE('URL Imagen: ' || v_producto.URL_IMAGEN);
+        DBMS_OUTPUT.PUT_LINE('ID Categor�a: ' || v_producto.ID_CATEGORIA);
+        DBMS_OUTPUT.PUT_LINE('ID Tipo Prenda: ' || v_producto.ID_TIPO_PRENDA);
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Producto no encontrado.');
+    END;
+
+    PROCEDURE actualizar_producto(
+        p_id_producto     IN PRODUCTOS.ID_PRODUCTO%TYPE,
+        p_nombre          IN PRODUCTOS.NOMBRE%TYPE,
+        p_descripcion     IN PRODUCTOS.DESCRIPCION%TYPE,
+        p_precio          IN PRODUCTOS.PRECIO%TYPE,
+        p_stock_minimo    IN PRODUCTOS.STOCK_MINIMO%TYPE,
+        p_url_imagen      IN PRODUCTOS.URL_IMAGEN%TYPE,
+        p_id_categoria    IN PRODUCTOS.ID_CATEGORIA%TYPE,
+        p_id_tipo_prenda  IN PRODUCTOS.ID_TIPO_PRENDA%TYPE
+    ) IS
+    BEGIN
+        UPDATE PRODUCTOS
+        SET 
+            NOMBRE = p_nombre,
+            DESCRIPCION = p_descripcion,
+            PRECIO = p_precio,
+            STOCK_MINIMO = p_stock_minimo,
+            URL_IMAGEN = p_url_imagen,
+            ID_CATEGORIA = p_id_categoria,
+            ID_TIPO_PRENDA = p_id_tipo_prenda
+        WHERE ID_PRODUCTO = p_id_producto;
+    END;
+
+    PROCEDURE eliminar_producto(
+        p_id_producto IN PRODUCTOS.ID_PRODUCTO%TYPE
+    ) IS
+    BEGIN
+        DELETE FROM PRODUCTOS
+        WHERE ID_PRODUCTO = p_id_producto;
+    END;
+
+END pkg_productos;
+
+---------------------------------------------------------------------------------------
+
+--Vista
+------------------------------
+CREATE OR REPLACE VIEW VISTA_PRODUCTOS_DETALLE AS
+SELECT
+    p.ID_PRODUCTO,
+    p.NOMBRE AS NOMBRE_PRODUCTO,
+    p.DESCRIPCION,
+    p.PRECIO,
+    p.STOCK_MINIMO,
+    p.URL_IMAGEN,
+    c.NOMBRE AS CATEGORIA,
+    t.NOMBRE AS TIPO_PRENDA
+FROM
+    PRODUCTOS p
+    LEFT JOIN CATEGORIAS c ON p.ID_CATEGORIA = c.ID_CATEGORIA
+    LEFT JOIN TIPO_PRENDAS t ON p.ID_TIPO_PRENDA = t.ID_TIPO_PRENDA;
+
+------------------------------
+
+SELECT * FROM VISTA_PRODUCTOS_DETALLE
+
+---------------------------------------------------------------------------------------
+
+--Funciones
+
+-----------------------------
+
+--Calcular en monto total del carrito de un usuario
+
+CREATE OR REPLACE FUNCTION calcular_total_carrito(p_id_usuario IN NUMBER)
+RETURN NUMBER
+IS
+    v_total NUMBER := 0;
+BEGIN
+    SELECT SUM(cd.CANTIDAD * p.PRECIO)
+    INTO v_total
+    FROM CARRITOS c
+    JOIN CARRITO_DETALLE cd ON c.ID_CARRITO = cd.ID_CARRITO
+    JOIN PRODUCTOS p ON cd.ID_PRODUCTO = p.ID_PRODUCTO
+    WHERE c.ID_USUARIO = p_id_usuario
+      AND c.ESTADO = 'ABIERTO'; -- o como est�s identificando el carrito activo
+
+    RETURN NVL(v_total, 0);
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN 0;
+END;
+---------------------------------
+SELECT calcular_total_carrito(1) AS total_carrito FROM DUAL;
+---------------------------------
+
+--consultar el srock de un producto desde la tabla inventario
+
+CREATE OR REPLACE FUNCTION stock_producto(p_id_producto IN NUMBER)
+RETURN NUMBER
+IS
+    v_stock NUMBER;
+BEGIN
+    SELECT STOCK_ACTUAL
+    INTO v_stock
+    FROM INVENTARIO
+    WHERE ID_PRODUCTO = p_id_producto;
+
+    RETURN v_stock;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN 0;
+END;
+---------------------------------
+SELECT calcular_total_carrito(1) AS total_carrito FROM DUAL;
+
+--------------------------------------------------------------------------------------
+
+--Cursores
+
+------------------------------------
+
+--Historial de compras por usuario
+
+DECLARE
+    -- ID del usuario que deseas consultar
+    v_id_usuario NUMBER := 1;
+
+    -- Cursor para obtener las ventas de ese usuario
+    CURSOR c_ventas IS
+        SELECT ID_VENTA, FECHA_VENTA, MONTO_TOTAL
+        FROM VENTAS
+        WHERE ID_USUARIO = v_id_usuario;
+
+    -- Cursor para obtener los detalles de cada venta
+    CURSOR c_detalle_venta(p_id_venta NUMBER) IS
+        SELECT dv.ID_DETALLE, p.NOMBRE AS nombre_producto, dv.CANTIDAD, dv.PRECIO_UNITARIO
+        FROM DETALLE_VENTAS dv
+        JOIN PRODUCTOS p ON dv.ID_PRODUCTO = p.ID_PRODUCTO
+        WHERE dv.ID_VENTA = p_id_venta;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('Historial de compras del usuario ' || v_id_usuario);
+    DBMS_OUTPUT.PUT_LINE('-----------------------------------------');
+
+    FOR venta IN c_ventas LOOP
+        DBMS_OUTPUT.PUT_LINE('Venta ID: ' || venta.ID_VENTA || 
+                             ' | Fecha: ' || venta.FECHA_VENTA || 
+                             ' | Monto total: ' || venta.MONTO_TOTAL);
+
+        FOR detalle IN c_detalle_venta(venta.ID_VENTA) LOOP
+            DBMS_OUTPUT.PUT_LINE('  - Producto: ' || detalle.nombre_producto ||
+                                 ' | Cantidad: ' || detalle.CANTIDAD ||
+                                 ' | Precio unitario: ' || detalle.PRECIO_UNITARIO);
+        END LOOP;
+
+        DBMS_OUTPUT.PUT_LINE(''); -- Salto de l�nea entre ventas
+    END LOOP;
+END;
+
+----------------------------------
+
+ set serveroutput on;
+----------------------------------
+
+-- Consulta de inventario con productos disponibles
+
+DECLARE
+    CURSOR c_productos_disponibles IS
+        SELECT p.NOMBRE AS NOMBRE_PRODUCTO,
+               c.NOMBRE AS CATEGORIA,
+               t.NOMBRE AS TIPO_PRENDA,
+               i.STOCK_ACTUAL,
+               p.PRECIO
+        FROM PRODUCTOS p
+        JOIN CATEGORIAS c ON p.ID_CATEGORIA = c.ID_CATEGORIA
+        JOIN TIPO_PRENDAS t ON p.ID_TIPO_PRENDA = t.ID_TIPO_PRENDA
+        JOIN INVENTARIO i ON p.ID_PRODUCTO = i.ID_PRODUCTO
+        WHERE i.STOCK_ACTUAL > 0;
+
+    -- Variables para recorrer el cursor
+    v_nombre_producto PRODUCTOS.NOMBRE%TYPE;
+    v_categoria CATEGORIAS.NOMBRE%TYPE;
+    v_tipo_prenda TIPO_PRENDAS.NOMBRE%TYPE;
+    v_stock_actual INVENTARIO.STOCK_ACTUAL%TYPE;
+    v_precio PRODUCTOS.PRECIO%TYPE;
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('PRODUCTOS DISPONIBLES EN INVENTARIO');
+    DBMS_OUTPUT.PUT_LINE('----------------------------------------');
+
+    OPEN c_productos_disponibles;
+    LOOP
+        FETCH c_productos_disponibles INTO
+            v_nombre_producto, v_categoria, v_tipo_prenda, v_stock_actual, v_precio;
+
+        EXIT WHEN c_productos_disponibles%NOTFOUND;
+
+        DBMS_OUTPUT.PUT_LINE('Producto: ' || v_nombre_producto || 
+                             ' | Categor�a: ' || v_categoria || 
+                             ' | Tipo: ' || v_tipo_prenda || 
+                             ' | Stock: ' || v_stock_actual || 
+                             ' | Precio: ' || v_precio);
+    END LOOP;
+    CLOSE c_productos_disponibles;
+END;
+
+-------------------------------------
+
+Inicio parte de Inventario 
+--------------------------------------
+
+---- Paquete inventario
+CREATE OR REPLACE PACKAGE PKG_INVENTARIO AS
+
+  PROCEDURE actualizar_stock(p_id_producto NUMBER, p_cantidad NUMBER);
+
+  PROCEDURE registrar_producto(
+    p_nombre        VARCHAR2,
+    p_descripcion   VARCHAR2,
+    p_precio        NUMBER,
+    p_stock_minimo  NUMBER,
+    p_url_imagen    VARCHAR2,
+    p_id_categoria  NUMBER,
+    p_id_tipo_prenda NUMBER
+  );
+
+  FUNCTION obtener_stock_producto(p_id_producto NUMBER) RETURN NUMBER;
+
+  FUNCTION esta_stock_bajo(p_id_producto NUMBER) RETURN VARCHAR2;
+
+  CURSOR cur_productos_stock_bajo IS
+    SELECT p.ID_PRODUCTO, p.NOMBRE, i.STOCK_ACTUAL, p.STOCK_MINIMO
+    FROM PRODUCTOS p JOIN INVENTARIO i ON p.ID_PRODUCTO = i.ID_PRODUCTO
+    WHERE i.STOCK_ACTUAL < p.STOCK_MINIMO;
+
+  CURSOR cur_inventario IS
+    SELECT p.ID_PRODUCTO, p.NOMBRE, i.STOCK_ACTUAL, p.STOCK_MINIMO
+    FROM PRODUCTOS p JOIN INVENTARIO i ON p.ID_PRODUCTO = i.ID_PRODUCTO;
+
+END PKG_INVENTARIO;
+/
+
+CREATE OR REPLACE PACKAGE BODY PKG_INVENTARIO AS
+
+  PROCEDURE actualizar_stock(p_id_producto NUMBER, p_cantidad NUMBER) IS
+  BEGIN
+    UPDATE INVENTARIO
+    SET STOCK_ACTUAL = STOCK_ACTUAL + p_cantidad
+    WHERE ID_PRODUCTO = p_id_producto;
+
+    IF SQL%ROWCOUNT = 0 THEN
+      INSERT INTO INVENTARIO (ID_INVENTARIO, ID_PRODUCTO, STOCK_ACTUAL)
+      VALUES (SEQ_INVENTARIO.NEXTVAL, p_id_producto, p_cantidad);
+    END IF;
+  END actualizar_stock;
+
+  PROCEDURE registrar_producto(
+    p_nombre        VARCHAR2,
+    p_descripcion   VARCHAR2,
+    p_precio        NUMBER,
+    p_stock_minimo  NUMBER,
+    p_url_imagen    VARCHAR2,
+    p_id_categoria  NUMBER,
+    p_id_tipo_prenda NUMBER
+  ) IS
+  BEGIN
+    INSERT INTO PRODUCTOS (
+      ID_PRODUCTO, NOMBRE, DESCRIPCION, PRECIO, STOCK_MINIMO, URL_IMAGEN, ID_CATEGORIA, ID_TIPO_PRENDA
+    ) VALUES (
+      SEQ_PRODUCTOS.NEXTVAL, p_nombre, p_descripcion, p_precio, p_stock_minimo, p_url_imagen, p_id_categoria, p_id_tipo_prenda
+    );
+  END registrar_producto;
+
+  FUNCTION obtener_stock_producto(p_id_producto NUMBER) RETURN NUMBER IS
+    v_stock NUMBER;
+  BEGIN
+    SELECT STOCK_ACTUAL INTO v_stock FROM INVENTARIO WHERE ID_PRODUCTO = p_id_producto;
+    RETURN NVL(v_stock, 0);
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN 0;
+  END obtener_stock_producto;
+
+  FUNCTION esta_stock_bajo(p_id_producto NUMBER) RETURN VARCHAR2 IS
+    v_stock NUMBER;
+    v_stock_min NUMBER;
+  BEGIN
+    SELECT i.STOCK_ACTUAL, p.STOCK_MINIMO
+      INTO v_stock, v_stock_min
+      FROM INVENTARIO i JOIN PRODUCTOS p ON i.ID_PRODUCTO = p.ID_PRODUCTO
+      WHERE i.ID_PRODUCTO = p_id_producto;
+
+    IF v_stock < v_stock_min THEN
+      RETURN 'Stock Bajo';
+    ELSE
+      RETURN 'Stock Normal';
+    END IF;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN 'Producto no encontrado';
+  END esta_stock_bajo;
+
+END PKG_INVENTARIO;
+/
+
+CREATE OR REPLACE VIEW V_ESTADO_INVENTARIO AS
+SELECT p.ID_PRODUCTO, p.NOMBRE, i.STOCK_ACTUAL, p.STOCK_MINIMO,
+       CASE WHEN i.STOCK_ACTUAL < p.STOCK_MINIMO THEN 'BAJO' ELSE 'OK' END AS ESTADO_STOCK
+FROM PRODUCTOS p JOIN INVENTARIO i ON p.ID_PRODUCTO = i.ID_PRODUCTO;
+/
+
+-- Trigger para asignar ID_INVENTARIO automáticamente
+CREATE OR REPLACE TRIGGER TRG_INVENTARIO_ID
+BEFORE INSERT ON INVENTARIO
+FOR EACH ROW
+BEGIN
+  :NEW.ID_INVENTARIO := SEQ_INVENTARIO.NEXTVAL;
+END;
+/
+
+-- Trigger para evitar stock negativo
+CREATE OR REPLACE TRIGGER TRG_PREV_STOCK_NEGATIVO
+BEFORE UPDATE ON INVENTARIO
+FOR EACH ROW
+BEGIN
+  IF :NEW.STOCK_ACTUAL < 0 THEN
+    RAISE_APPLICATION_ERROR(-20001, 'El stock no puede ser negativo');
+  END IF;
+END;
+/
+
+-- Trigger para notificar stock bajo
+CREATE OR REPLACE TRIGGER TRG_NOTIFICAR_STOCK_BAJO
+AFTER UPDATE ON INVENTARIO
+FOR EACH ROW
+DECLARE
+  v_stock_minimo NUMBER;
+BEGIN
+  SELECT STOCK_MINIMO INTO v_stock_minimo
+  FROM PRODUCTOS
+  WHERE ID_PRODUCTO = :NEW.ID_PRODUCTO;
+
+  IF :NEW.STOCK_ACTUAL < v_stock_minimo THEN
+    --  código para enviar alerta:
+    -- INSERT INTO LOG_ALERTAS (ID_LOG, MENSAJE, FECHA) VALUES (SEQ_LOG_ALERTAS.NEXTVAL, 'Stock bajo para producto ' || :NEW.ID_PRODUCTO, SYSDATE);
+    NULL; -- placeholder, reemplaza por código real
+  END IF;
+END;
+/
+
+-- Trigger para bloquear eliminación de producto si existe en inventario
+CREATE OR REPLACE TRIGGER TRG_BLOQUEAR_ELIMINACION_PRODUCTO
+BEFORE DELETE ON PRODUCTOS
+FOR EACH ROW
+DECLARE
+  v_count NUMBER;
+BEGIN
+  SELECT COUNT(*) INTO v_count FROM INVENTARIO WHERE ID_PRODUCTO = :OLD.ID_PRODUCTO;
+  IF v_count > 0 THEN
+    RAISE_APPLICATION_ERROR(-20005, 'No puede eliminar producto que existe en inventario');
+  END IF;
+END;
+/
+
+-- Trigger para actualizar inventario automáticamente al insertar producto nuevo (opcional)
+CREATE OR REPLACE TRIGGER TRG_INSERTAR_INVENTARIO_ALTA_PRODUCTO
+AFTER INSERT ON PRODUCTOS
+FOR EACH ROW
+BEGIN
+  INSERT INTO INVENTARIO(ID_INVENTARIO, ID_PRODUCTO, STOCK_ACTUAL)
+  VALUES (SEQ_INVENTARIO.NEXTVAL, :NEW.ID_PRODUCTO, 0);
+END;
+/
+
+CREATE OR REPLACE PACKAGE PKG_VENTAS_COMPRAS AS
+  PROCEDURE agregar_producto_carrito(p_id_usuario NUMBER, p_id_producto NUMBER, p_cantidad NUMBER);
+  PROCEDURE finalizar_compra(p_id_usuario NUMBER);
+  FUNCTION calcular_total_carrito(p_id_usuario NUMBER) RETURN NUMBER;
+  PROCEDURE obtener_resumen_pedido(p_id_usuario NUMBER, p_cursor OUT SYS_REFCURSOR);
+  CURSOR cur_historial_ventas IS
+    SELECT v.ID_VENTA, u.NOMBRE AS CLIENTE, v.FECHA_VENTA, v.MONTO_TOTAL
+    FROM VENTAS v JOIN USUARIOS u ON v.ID_USUARIO = u.ID_USUARIO
+    ORDER BY v.FECHA_VENTA DESC;
+  CURSOR cur_productos_mas_vendidos IS
+    SELECT p.ID_PRODUCTO, p.NOMBRE, SUM(dv.CANTIDAD) AS CANTIDAD_VENDIDA
+    FROM DETALLE_VENTAS dv JOIN PRODUCTOS p ON dv.ID_PRODUCTO = p.ID_PRODUCTO
+    GROUP BY p.ID_PRODUCTO, p.NOMBRE
+    ORDER BY CANTIDAD_VENDIDA DESC;
+END PKG_VENTAS_COMPRAS;
+/
+
+CREATE OR REPLACE PACKAGE BODY PKG_VENTAS_COMPRAS AS
+
+  PROCEDURE agregar_producto_carrito(p_id_usuario NUMBER, p_id_producto NUMBER, p_cantidad NUMBER) IS
+    v_id_carrito NUMBER;
+  BEGIN
+    BEGIN
+      SELECT ID_CARRITO INTO v_id_carrito
+      FROM CARRITOS
+      WHERE ID_USUARIO = p_id_usuario AND ESTADO = 'Abierto';
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+        INSERT INTO CARRITOS (ID_CARRITO, ID_USUARIO, FECHA_CREACION, ESTADO)
+        VALUES (SEQ_CARRITOS.NEXTVAL, p_id_usuario, SYSDATE, 'Abierto');
+        SELECT ID_CARRITO INTO v_id_carrito
+        FROM CARRITOS
+        WHERE ID_USUARIO = p_id_usuario AND ESTADO = 'Abierto';
+    END;
+
+    BEGIN
+      DECLARE
+        v_id_detalle NUMBER;
+      BEGIN
+        SELECT ID_DETALLE INTO v_id_detalle
+        FROM CARRITO_DETALLE
+        WHERE ID_CARRITO = v_id_carrito AND ID_PRODUCTO = p_id_producto;
+
+        UPDATE CARRITO_DETALLE SET CANTIDAD = CANTIDAD + p_cantidad WHERE ID_DETALLE = v_id_detalle;
+      EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+          INSERT INTO CARRITO_DETALLE (ID_DETALLE, ID_CARRITO, ID_PRODUCTO, CANTIDAD)
+          VALUES (SEQ_CARRITO_DETALLE.NEXTVAL, v_id_carrito, p_id_producto, p_cantidad);
+      END;
+    END;
+  END agregar_producto_carrito;
+
+  PROCEDURE finalizar_compra(p_id_usuario NUMBER) IS
+    v_id_carrito NUMBER;
+    v_monto_total NUMBER(10,2);
+    v_id_venta NUMBER;
+  BEGIN
+    SELECT ID_CARRITO INTO v_id_carrito FROM CARRITOS WHERE ID_USUARIO = p_id_usuario AND ESTADO = 'Abierto';
+
+    SELECT SUM(cd.CANTIDAD * p.PRECIO) INTO v_monto_total
+    FROM CARRITO_DETALLE cd JOIN PRODUCTOS p ON cd.ID_PRODUCTO = p.ID_PRODUCTO
+    WHERE cd.ID_CARRITO = v_id_carrito;
+
+    INSERT INTO VENTAS (ID_VENTA, ID_USUARIO, FECHA_VENTA, MONTO_TOTAL)
+    VALUES (SEQ_VENTAS.NEXTVAL, p_id_usuario, SYSDATE, v_monto_total);
+    SELECT SEQ_VENTAS.CURRVAL INTO v_id_venta FROM DUAL;
+
+    FOR rec IN (SELECT * FROM CARRITO_DETALLE WHERE ID_CARRITO = v_id_carrito) LOOP
+      INSERT INTO DETALLE_VENTAS (ID_DETALLE, ID_VENTA, ID_PRODUCTO, CANTIDAD, PRECIO_UNITARIO)
+      VALUES (SEQ_DETALLE_VENTAS.NEXTVAL, v_id_venta, rec.ID_PRODUCTO, rec.CANTIDAD,
+              (SELECT PRECIO FROM PRODUCTOS WHERE ID_PRODUCTO = rec.ID_PRODUCTO));
+
+      UPDATE INVENTARIO SET STOCK_ACTUAL = STOCK_ACTUAL - rec.CANTIDAD WHERE ID_PRODUCTO = rec.ID_PRODUCTO;
+    END LOOP;
+
+    UPDATE CARRITOS SET ESTADO = 'Cerrado' WHERE ID_CARRITO = v_id_carrito;
+
+    DELETE FROM CARRITO_DETALLE WHERE ID_CARRITO = v_id_carrito;
+  END finalizar_compra;
+
+  FUNCTION calcular_total_carrito(p_id_usuario NUMBER) RETURN NUMBER IS
+    v_total NUMBER(10,2);
+    v_id_carrito NUMBER;
+  BEGIN
+    SELECT ID_CARRITO INTO v_id_carrito FROM CARRITOS WHERE ID_USUARIO = p_id_usuario AND ESTADO = 'Abierto';
+
+    SELECT SUM(cd.CANTIDAD * p.PRECIO) INTO v_total
+    FROM CARRITO_DETALLE cd JOIN PRODUCTOS p ON cd.ID_PRODUCTO = p.ID_PRODUCTO
+    WHERE cd.ID_CARRITO = v_id_carrito;
+
+    RETURN NVL(v_total, 0);
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      RETURN 0;
+  END calcular_total_carrito;
+
+  PROCEDURE obtener_resumen_pedido(p_id_usuario NUMBER, p_cursor OUT SYS_REFCURSOR) IS
+    v_id_carrito NUMBER;
+  BEGIN
+    SELECT ID_CARRITO INTO v_id_carrito FROM CARRITOS WHERE ID_USUARIO = p_id_usuario AND ESTADO = 'Abierto';
+
+    OPEN p_cursor FOR
+      SELECT p.NOMBRE, cd.CANTIDAD, p.PRECIO, (cd.CANTIDAD * p.PRECIO) AS SUBTOTAL
+      FROM CARRITO_DETALLE cd JOIN PRODUCTOS p ON cd.ID_PRODUCTO = p.ID_PRODUCTO
+      WHERE cd.ID_CARRITO = v_id_carrito;
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      OPEN p_cursor FOR SELECT NULL FROM DUAL WHERE 1=0; -- cursor vacío
+  END obtener_resumen_pedido;
+
+END PKG_VENTAS_COMPRAS;
+/
+
+CREATE OR REPLACE VIEW V_RESUMEN_VENTAS AS
+SELECT v.ID_VENTA, u.NOMBRE AS CLIENTE, v.FECHA_VENTA, v.MONTO_TOTAL
+FROM VENTAS v JOIN USUARIOS u ON v.ID_USUARIO = u.ID_USUARIO
+ORDER BY v.FECHA_VENTA DESC;
+/
+
+-- Trigger para asignar ID_CARRITO automáticamente
+CREATE OR REPLACE TRIGGER TRG_CARRITOS_ID
+BEFORE INSERT ON CARRITOS
+FOR EACH ROW
+BEGIN
+  :NEW.ID_CARRITO := SEQ_CARRITOS.NEXTVAL;
+END;
+/
+
+-- Trigger para asignar ID_DETALLE automáticamente
+CREATE OR REPLACE TRIGGER TRG_CARRITO_DETALLE_ID
+BEFORE INSERT ON CARRITO_DETALLE
+FOR EACH ROW
+BEGIN
+  :NEW.ID_DETALLE := SEQ_CARRITO_DETALLE.NEXTVAL;
+END;
+/
+
+-- Trigger para asignar ID_VENTA automáticamente
+CREATE OR REPLACE TRIGGER TRG_VENTAS_ID
+BEFORE INSERT ON VENTAS
+FOR EACH ROW
+BEGIN
+  :NEW.ID_VENTA := SEQ_VENTAS.NEXTVAL;
+END;
+/
+
+-- Trigger para asignar ID_DETALLE_VENTA automáticamente
+CREATE OR REPLACE TRIGGER TRG_DETALLE_VENTAS_ID
+BEFORE INSERT ON DETALLE_VENTAS
+FOR EACH ROW
+BEGIN
+  :NEW.ID_DETALLE := SEQ_DETALLE_VENTAS.NEXTVAL;
+END;
+/
+
+-- Trigger para evitar carrito abierto duplicado por usuario
+CREATE OR REPLACE TRIGGER TRG_UNICO_CARRITO_ABIERTO
+BEFORE INSERT ON CARRITOS
+FOR EACH ROW
+DECLARE
+  v_count NUMBER;
+BEGIN
+  SELECT COUNT(*) INTO v_count FROM CARRITOS WHERE ID_USUARIO = :NEW.ID_USUARIO AND ESTADO = 'Abierto';
+  IF v_count > 0 THEN
+    RAISE_APPLICATION_ERROR(-20003, 'El usuario ya tiene un carrito abierto');
+  END IF;
+END;
+/
+
+
+------------------------
+---Inserts de datos para usar en la aplicacion (solo para verificar las conexiones)
+------------------------
+
+INSERT INTO USUARIOS (NOMBRE, CORREO, CONTRASENA, DIRECCION, TELEFONO, ROLE) VALUES
+('sebas', 'sebas@admin.com', '123', 'San Jose', '8888-1111', 'admin');
+
+INSERT INTO USUARIOS (NOMBRE, CORREO, CONTRASENA, DIRECCION, TELEFONO, ROLE) VALUES
+('Laura', 'laura@example.com', 'laura456', 'Alajuela', '8888-2222', 'cliente');
+
+INSERT INTO USUARIOS (NOMBRE, CORREO, CONTRASENA, DIRECCION, TELEFONO, ROLE) VALUES
+('Carlos', 'carlos@example.com', 'carlos789', 'Cartago', '8888-3333', 'cliente');
+
+INSERT INTO CATEGORIAS (NOMBRE) VALUES ('Dama');
+INSERT INTO CATEGORIAS (NOMBRE) VALUES ('Caballero');
+INSERT INTO CATEGORIAS (NOMBRE) VALUES ('Niños');
+INSERT INTO CATEGORIAS (NOMBRE) VALUES ('Deportivo');
+INSERT INTO CATEGORIAS (NOMBRE) VALUES ('Formal');
+
+INSERT INTO TIPO_PRENDAS (NOMBRE) VALUES ('Camisa');
+INSERT INTO TIPO_PRENDAS (NOMBRE) VALUES ('Pantalón');
+INSERT INTO TIPO_PRENDAS (NOMBRE) VALUES ('Vestido');
+INSERT INTO TIPO_PRENDAS (NOMBRE) VALUES ('Zapatos');
+INSERT INTO TIPO_PRENDAS (NOMBRE) VALUES ('Chaqueta');
+
+set define off;
+
+INSERT INTO PRODUCTOS (NOMBRE, DESCRIPCION, PRECIO, STOCK_MINIMO, URL_IMAGEN, ID_CATEGORIA, ID_TIPO_PRENDA) VALUES
+('Camisa casual', 'Camisa de algodón para hombre', 14900, 5, 'https://images.unsplash.com/photo-1693443688057-85f57b872a3c?q=80&w=1287&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 2, 1);
+
+INSERT INTO PRODUCTOS (NOMBRE, DESCRIPCION, PRECIO, STOCK_MINIMO, URL_IMAGEN, ID_CATEGORIA, ID_TIPO_PRENDA) VALUES
+('Pantalón jean', 'Pantalón mezclilla clásico', 19900, 8, 'https://images.unsplash.com/photo-1718252540585-499e23ef57a2?q=80&w=1160&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 2, 2);
+
+INSERT INTO PRODUCTOS (NOMBRE, DESCRIPCION, PRECIO, STOCK_MINIMO, URL_IMAGEN, ID_CATEGORIA, ID_TIPO_PRENDA) VALUES
+('Vestido floreado', 'Vestido para primavera', 24900, 3, 'https://plus.unsplash.com/premium_photo-1675186049409-f9f8f60ebb5e?q=80&w=1287&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 1, 3);
+
+INSERT INTO PRODUCTOS (NOMBRE, DESCRIPCION, PRECIO, STOCK_MINIMO, URL_IMAGEN, ID_CATEGORIA, ID_TIPO_PRENDA) VALUES
+('Tenis deportivos', 'Tenis para correr', 29900, 4, 'https://images.unsplash.com/photo-1599948126325-0fba3761669a?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 4, 4);
+
+INSERT INTO PRODUCTOS (NOMBRE, DESCRIPCION, PRECIO, STOCK_MINIMO, URL_IMAGEN, ID_CATEGORIA, ID_TIPO_PRENDA) VALUES
+('Chaqueta de cuero', 'Chaqueta negra elegante', 34900, 2, 'https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?q=80&w=1280&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', 2, 5);
+
+INSERT INTO INVENTARIO (ID_PRODUCTO, STOCK_ACTUAL) VALUES (1, 10);
+INSERT INTO INVENTARIO (ID_PRODUCTO, STOCK_ACTUAL) VALUES (2, 15);
+INSERT INTO INVENTARIO (ID_PRODUCTO, STOCK_ACTUAL) VALUES (3, 5);
+INSERT INTO INVENTARIO (ID_PRODUCTO, STOCK_ACTUAL) VALUES (4, 8);
+INSERT INTO INVENTARIO (ID_PRODUCTO, STOCK_ACTUAL) VALUES (5, 3);
+
+COMMIT;
+
+-- =========================================
+-- Insertar en VENTAS
+-- =========================================
+INSERT INTO VENTAS (ID_VENTA, ID_USUARIO, FECHA_VENTA, MONTO_TOTAL)
+VALUES (1, 1, SYSDATE, 50000);
+INSERT INTO VENTAS (ID_VENTA, ID_USUARIO, FECHA_VENTA, MONTO_TOTAL)
+VALUES (2, 2, SYSDATE, 35000);
+
+-- =========================================
+-- Insertar en DETALLE_VENTAS
+-- =========================================
+INSERT INTO DETALLE_VENTAS (ID_DETALLE, ID_VENTA, ID_PRODUCTO, CANTIDAD, PRECIO_UNITARIO)
+VALUES (1, 1, 1, 2, 15000);
+INSERT INTO DETALLE_VENTAS (ID_DETALLE, ID_VENTA, ID_PRODUCTO, CANTIDAD, PRECIO_UNITARIO)
+VALUES (2, 1, 2, 1, 20000);
+
+-- Confirmar transacciones
+COMMIT;
