@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="~{layout/plantilla :: head}">
+        <title>FidExpress</title>
+        <meta charset="UTF-8"/>
+        <link href="css/estilos.css" rel="stylesheet" type="text/css"/>
+
+
+    </head>
+    <body>
+        <header th:replace="layout/plantilla::header"></header>
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+
+                    <div class="card shadow-lg">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">Actualizar Usuario</h4>
+                        </div>
+
+                        <div class="card-body">
+                            <form th:action="@{/usuario/actualizar/aplicar}" th:object="${usuario}" method="post">
+
+                                <input type="hidden" th:field="*{id_Usuario}" />
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Nombre</label>
+                                    <input type="text" th:field="*{nombre}" class="form-control" placeholder="Ingrese el nombre" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Correo</label>
+                                    <input type="email" th:field="*{correo}" class="form-control" placeholder="usuario@correo.com" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Contraseña</label>
+                                    <input type="password" th:field="*{contrasena}" class="form-control" placeholder="Nueva contraseña" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Dirección</label>
+                                    <input type="text" th:field="*{direccion}" class="form-control" placeholder="Dirección completa">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Teléfono</label>
+                                    <input type="text" th:field="*{telefono}" class="form-control" placeholder="Ej: 8888-8888">
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <a th:href="@{/}" class="btn btn-secondary">Cancelar</a>
+                                    <button type="submit" class="btn btn-success">Guardar cambios</button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <footer th:replace="layout/plantilla::footer"></footer>
+    </body>
+</html>

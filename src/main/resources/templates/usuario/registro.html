@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{layout/plantilla :: head}">
+        <title>FidExpress</title>
+        <meta charset="UTF-8"/>
+        <link href="css/estilos.css" rel="stylesheet" type="text/css"/>
+
+        
+    </head>
+    <body class="bg-light">
+        <header th:replace="layout/plantilla::header"></header>
+        <div class="container mt-5">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Registrar Nuevo Usuario</h4>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/usuario/guardar}" th:object="${usuario}" method="POST">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" class="form-control" th:field="*{nombre}" placeholder="Nombre completo" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Correo electrónico</label>
+                                <input type="email" class="form-control" th:field="*{correo}" placeholder="ejemplo@correo.com" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" th:field="*{contrasena}" placeholder="Contraseña segura" required>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label class="form-label">Dirección</label>
+                                <input type="text" class="form-control" th:field="*{direccion}" placeholder="Dirección exacta" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Teléfono</label>
+                                <input type="text" class="form-control" th:field="*{telefono}" placeholder="Número de teléfono" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Rol</label>
+                            <select class="form-select" th:field="*{role}" required>
+                                <option value="" disabled selected>Seleccione un role</option>
+                                <option value="ADMIN">Administrador</option>
+                                <option value="USUARIO">Usuario</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Registrar Usuario</button>
+                        <a href="/" class="btn btn-secondary">Cancelar</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <footer th:replace="layout/plantilla::footer"></footer>
+    </body>
+</html>

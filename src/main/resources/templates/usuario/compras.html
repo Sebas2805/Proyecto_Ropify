@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+    <head th:replace="~{layout/plantilla :: head}">
+        <title>FidExpress</title>
+        <meta charset="UTF-8"/>
+        <link href="css/estilos.css" rel="stylesheet" type="text/css"/>
+
+
+    </head>
+    <body class="bg-light">
+        <header th:replace="layout/plantilla::header"></header>
+
+        <h1 class="mb-4" th:text="'Compras de ' + ${usuarioNombre}">Compras</h1>
+
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID Compra</th>
+                        <th>Fecha</th>
+                        <th class="text-end">Monto Total</th>
+                        <th class="text-center">Artículos</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="v : ${ventas}">
+                        <td th:text="${v.idVenta}">1</td>
+                        <td th:text="${v.fechaVenta != null ? #temporals.format(v.fechaVenta, 'dd/MM/yyyy HH:mm') : ''}">01/01/2025 12:00</td>
+                        <td class="text-end" th:text="${#numbers.formatDecimal(v.montoTotal, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+                        <td class="text-center" th:text="${v.cantidadArticulos}">0</td>
+                        <td class="text-center">
+                            
+                            <a class="btn btn-primary btn-sm"
+                               th:href="@{/usuario/ventas/{idVenta}(idVenta=${v.idVenta})}">
+                                Ver compra
+                            </a>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${ventas == null or #lists.isEmpty(ventas)}">
+                        <td colspan="5" class="text-center text-muted">No hay compras registradas.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer th:replace="layout/plantilla::footer"></footer>
+    </body>
+</html>

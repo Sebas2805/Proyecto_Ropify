@@ -4,44 +4,46 @@
     <head th:fragment="head">
         <title>Ropify</title>
         <meta charset="UTF-8"/>
-        <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
-        <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.css}"/>
-     
-        
+
+        <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet"/>
+        <link th:href="@{/webjars/font-awesome/css/all.css}" rel="stylesheet"/>
         <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
         <script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
         <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
-        <link href="css/estilos.css" rel="stylesheet" type="text/css"/>
+        <link th:href="@{/css/estilos.css}" rel="stylesheet" type="text/css"/>
     </head>
     <body>
         <header th:fragment="header" class="header nav-color">
-            <nav class="navbar navbar-expand-sm navbar-dark  p-0 ">
-                <div class="container ">
-                    
+            <nav class="navbar navbar-expand-sm navbar-dark p-0">
+                <div class="container">
                     <a th:href="@{/}" class="navbar-brand">Ropify</a>
-                    <button class="navbar-toggler"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#menu">
+                    <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menu">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-                    <div id="menu" 
-                         class="collapse navbar-collapse ">
-                        <ul class="navbar-nav ">
+                    <div id="menu" class="collapse navbar-collapse">
+                        <ul class="navbar-nav">
                             <li class="nav-item px-2">
-                                <a class="nav-menu-link nav-link text-color"
-                                   th:href="@{/productosClientes}">Productos</a>
+                                <a class="nav-menu-link nav-link text-color" th:href="@{/productosClientes}">Productos</a>
                             </li>
-                          
                             <li class="nav-item px-2">
-                                <a class="nav-menu-link nav-link text-color"
-                                   th:href="@{/nosotros}">Sobre Nosotros</a>
+                                <a class="nav-menu-link nav-link text-color" th:href="@{/nosotros}">Sobre Nosotros</a>
                             </li>
-                            
                             <li class="nav-item px-2">
-                                <a class="nav-menu-link nav-link text-color"
-                                   th:href="@{/admin}">Admin</a>
+                                <a class="nav-menu-link nav-link text-color" th:href="@{/admin}">Admin</a>
                             </li>
-                           
+                        </ul>
+                        <ul class="navbar-nav ms-auto" th:if="${session.usuario == null}">
+                            <li class="nav-item px-2">
+                                <a class="nav-menu-link nav-link text-color" th:href="@{/usuario/registrar}">Registro</a>
+                            </li>
+                            <li class="nav-item px-2">
+                                <a class="nav-menu-link nav-link text-color" th:href="@{/usuario/nuevoInicioSesion}">Inicio Sesion</a>
+                            </li>
+                        </ul>
+                        <ul class="navbar-nav ms-auto" th:if="${session.usuario != null}">
+                            <li class="nav-item px-2">
+                                <a class="nav-menu-link nav-link text-color" th:href="@{/usuario/menu}">Perfil</a>
+                            </li>
                         </ul>
                     </div>
                 </div>

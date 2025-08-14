@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{layout/plantilla :: head}">
     <title>FidExpress</title>
     <meta charset="UTF-8"/>
-    <link href="css/estilos.css" rel="stylesheet" type="text/css"/>
+    <link th:href="~{../css/estilos.css}" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
-    <header th:replace="layout/plantilla::header"></header>
+    <header th:replace="~{layout/plantilla :: header}"></header>
 
     <div class="container mt-5">
         <h1 class="titulo mb-4">Usuarios</h1>
@@ -37,7 +38,7 @@
                         <td th:text="${usuario.telefono}"></td>
                         <td th:text="${usuario.role}"></td>
                         <td class="text-center">
-                            <a th:href="@{/modificarUsuario/{idUsuario}(idUsuario=${usuario.id_Usuario})}" class="btn btn-sm btn-primary">Actualizar</a>
+                            <a th:href="@{/usuario/actualizar/{idUsuario}(idUsuario=${usuario.id_Usuario})}" class="btn btn-sm btn-primary">Actualizar</a>
                         </td>
                         <td class="text-center">
                             <a th:href="@{/eliminarUsuario/{idUsuario}(idUsuario=${usuario.id_Usuario})}" class="btn btn-sm btn-danger">Eliminar</a>
@@ -48,10 +49,10 @@
         </div>
 
         <div class="text-end mt-3">
-            <a th:href="@{/nuevoUsuario}" class="btn btn-success">Nuevo Usuario</a>
+            <a th:href="@{/usuario/registrar}" class="btn btn-success">Nuevo Usuario</a>
         </div>
     </div>
 
-    <footer th:replace="layout/plantilla::footer"></footer>
+    <footer th:replace="~{layout/plantilla :: footer}"></footer>
 </body>
 </html>
