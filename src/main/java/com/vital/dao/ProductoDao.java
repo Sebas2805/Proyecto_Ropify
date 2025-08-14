@@ -15,5 +15,8 @@ public interface ProductoDao extends JpaRepository<Producto, Integer>
 @Transactional
 @Query(value = "CALL pkg_productos.eliminar_producto(:idProducto)", nativeQuery = true)
 void eliminarProducto(@Param("idProducto") int idProducto);
+
+ 
+ 
 }
 

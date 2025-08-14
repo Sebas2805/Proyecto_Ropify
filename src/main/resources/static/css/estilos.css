@@ -7,12 +7,10 @@
 .titulo{
     color: #072326;
     text-align: center;
-
 }
 .sub-titulo{
     color: #54BFB5;
     text-align: center;
-
 }
 .display {
     display: flex;
@@ -25,26 +23,21 @@ table{
     background-color: #072326;
     color: #ffffff;
 }
-
 .btn-outline-primary {
     border-color: #54BFB5;
     color: #54BFB5;
 }
-
 .btn-outline-primary:hover {
     background-color: #54BFB5;
     color: #fff;
 }
-
 .btn-success {
     background-color: #54BFB5;
     border: none;
 }
-
 .btn-success:hover {
     background-color: #3aa49a;
 }
-
 .titulo {
     font-weight: bold;
     font-size: 2rem;
@@ -62,7 +55,6 @@ body {
     padding: 0;
     background-color: #f9f9f9;
 }
-
 /* Header */
 header {
     background-color: #072326;
@@ -70,7 +62,6 @@ header {
     text-align: center;
     color: #fff;
 }
-
 /* Títulos */
 .titulo {
     color: #072326;
@@ -78,14 +69,12 @@ header {
     font-size: 2em;
     margin-bottom: 10px;
 }
-
 .sub-titulo {
     color: #54BFB5;
     text-align: center;
     font-size: 1.2em;
     margin-bottom: 30px;
 }
-
 /* Banner */
 .banner {
     position: relative;
@@ -93,12 +82,10 @@ header {
     max-height: 400px;
     overflow: hidden;
 }
-
 .banner img {
     width: 100%;
     height: auto;
 }
-
 .banner-text {
     position: absolute;
     top: 50%;
@@ -107,17 +94,14 @@ header {
     text-align: center;
     color: #fff;
 }
-
 .banner-text h1 {
     font-size: 2.5em;
     margin: 0;
 }
-
 .banner-text p {
     font-size: 1.2em;
     margin-top: 10px;
 }
-
 .banner-text .btn {
     margin-top: 20px;
     background-color: #54BFB5;
@@ -127,14 +111,12 @@ header {
     font-size: 1.2em;
     border-radius: 5px;
 }
-
 /* Categorías */
 .categories {
     display: flex;
     justify-content: space-around;
     margin-bottom: 30px;
 }
-
 .category-card {
     background-color: #fff;
     padding: 20px;
@@ -144,20 +126,17 @@ header {
     transition: all 0.3s ease;
     width: 25%;
 }
-
 .category-card img {
     width: 100%;
     height: 150px;
     object-fit: cover;
     border-radius: 5px;
 }
-
 .category-card h3 {
     font-size: 1.5em;
     color: #072326;
     margin-top: 15px;
 }
-
 .category-card a {
     text-decoration: none;
     color: #54BFB5;
@@ -165,39 +144,36 @@ header {
     margin-top: 10px;
     display: inline-block;
 }
-
 .category-card:hover {
     transform: translateY(-10px);
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
 }
-
-/* Productos Destacados */
-.featured-products {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    margin-bottom: 30px;
+/* Productos Destacados y tarjetas de producto */
+.product-card {
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  background-color: #fff;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  height: 100%; /* para que ocupe toda la altura de la columna */
+  display: flex;
+  flex-direction: column;
 }
 
-.product-card {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 30%;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
 .product-card img {
     width: 100%;
-    height: 200px;
+    height: 250px;
     object-fit: cover;
-    border-radius: 5px;
+    border-radius: 10px;
 }
 
-.product-card h3 {
+.product-card h3,
+.product-card h5 {
     font-size: 1.5em;
     color: #072326;
     margin-top: 15px;
@@ -213,24 +189,29 @@ header {
     background-color: #54BFB5;
     color: white;
     padding: 10px 20px;
-    text-decoration: none;
-    font-size: 1.2em;
-    border-radius: 5px;
+    border-radius: 8px;
+    font-weight: 500;
+    border: none;
     margin-top: 15px;
+    text-decoration: none;
+    cursor: pointer;
 }
 
-.product-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+.product-card .btn:hover {
+    background-color: #3aa49a;
 }
 
+.badge {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+    border-radius: 8px;
+}
 /* Testimonios */
 .testimonials {
     display: flex;
     justify-content: space-around;
     margin-bottom: 30px;
 }
-
 .testimonial-card {
     background-color: #fff;
     padding: 20px;
@@ -241,12 +222,10 @@ header {
     font-style: italic;
     text-align: center;
 }
-
 .testimonial-card p {
     font-size: 1.2em;
     color: #444;
 }
-
 .testimonial-card h3 {
     font-size: 1.1em;
     color: #072326;
@@ -259,4 +238,9 @@ footer {
     padding: 20px;
     text-align: center;
     margin-top: 50px;
+}
+.card-body {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }

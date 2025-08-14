@@ -2,10 +2,19 @@ package com.vital.service.impl;
 
 import com.vital.dao.ProductoDao;
 import com.vital.domain.Producto;
+import com.vital.domain.ProductoDTO;
 import com.vital.service.ProductoService;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.List;
+import java.util.Map;
+import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SqlOutParameter;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,10 +29,10 @@ public class ProductoServicesImpl implements ProductoService
     @Autowired
     private JdbcTemplate jdbcTemplate;
     
-     @Override
+    @Override
     public List<Producto> getProductos() {
           return productoDao.findAll();
-    }
+    } 
     
      @Transactional
     public void agregarProducto(Producto producto) {
@@ -73,5 +82,8 @@ public class ProductoServicesImpl implements ProductoService
     }
     
     
+    
+    
+   
     
 }
