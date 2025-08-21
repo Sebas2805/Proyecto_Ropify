@@ -139,7 +139,7 @@ header {
 }
 .category-card a {
     text-decoration: none;
-    color: #54BFB5;
+    color:#ffffff ;
     font-size: 1.2em;
     margin-top: 10px;
     display: inline-block;
@@ -151,60 +151,46 @@ header {
 /* Productos Destacados y tarjetas de producto */
 .product-card {
   border: none;
-  border-radius: 15px;
+  border-radius: 12px;
   overflow: hidden;
   background-color: #fff;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  height: 100%; /* para que ocupe toda la altura de la columna */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
-}
-
-.product-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  height: 100%;
+  margin: 0 auto;     /* centra dentro de la columna */
 }
 
 .product-card img {
-    width: 100%;
-    height: 250px;
-    object-fit: cover;
-    border-radius: 10px;
+  width: 100%;
+  height: 180px;      /* más compacto */
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
 }
 
-.product-card h3,
-.product-card h5 {
-    font-size: 1.5em;
-    color: #072326;
-    margin-top: 15px;
+.card-body h5 {
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
 }
 
-.product-card p {
-    font-size: 1.1em;
-    color: #444;
-    margin-top: 10px;
+.card-body p {
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
 }
 
-.product-card .btn {
-    background-color: #54BFB5;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 500;
-    border: none;
-    margin-top: 15px;
-    text-decoration: none;
-    cursor: pointer;
+.price {
+  font-size: 0.95rem;
+  font-weight: bold;
 }
 
-.product-card .btn:hover {
-    background-color: #3aa49a;
+.btn {
+  font-size: 0.85rem;
+  padding: 6px 12px;
 }
 
-.badge {
-    font-size: 0.8rem;
-    padding: 5px 10px;
-    border-radius: 8px;
+.row.justify-content-center {
+  max-width: 1200px; /* o el ancho que quieras */
+  margin: 0 auto;
 }
 /* Testimonios */
 .testimonials {
@@ -243,4 +229,15 @@ footer {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+}
+
+
+
+
+form select {
+    min-width: 180px; /* Ancho mínimo de los dropdowns */
+}
+
+form button {
+    height: 38px; /* Igualar altura con los selects */
 }

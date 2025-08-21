@@ -11,5 +11,5 @@ public interface ProductoClientesDao
     
     List<ProductoDTO> obtenerProductosConStock(String categoriaNombre, String tipoNombre );
     
-  
+    List<ProductoDTO> obtenerProductos(String categoria, String tipoPrenda);
 }

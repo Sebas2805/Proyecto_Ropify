@@ -10,5 +10,5 @@ public interface ProductoClientesService
     
     List<ProductoDTO> obtenerProductosFiltrados(String categoria, String tipo);
       
- 
+    List<ProductoDTO> obtenerProductos(String categoria, String tipoPrenda);
 }

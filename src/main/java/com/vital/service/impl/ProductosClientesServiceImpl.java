@@ -32,7 +32,10 @@ public class ProductosClientesServiceImpl implements ProductoClientesService
         
     }
     
-  
+  @Override
+    public List<ProductoDTO> obtenerProductos(String categoria, String tipoPrenda) {
+        return productoClientesDao.obtenerProductos(categoria, tipoPrenda);
+    }
     
     
 }
