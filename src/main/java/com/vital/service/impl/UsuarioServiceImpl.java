@@ -1,5 +1,6 @@
 package com.vital.service.impl;
 
+import com.vital.DTO.DetalleVentaFila;
 import com.vital.DTO.ResumenUsuarioCompraFile;
 import com.vital.dao.UsuarioDao;
 import com.vital.domain.Usuario;
@@ -159,6 +160,68 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuario.getTelefono()
         );
         return filas > 0;
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<DetalleVentaFila> obtenerDetalleVenta(Integer idVenta) {
+        return jdbcTemplate.execute(
+                (CallableStatementCreator) con -> {
+                    CallableStatement cs = con.prepareCall("{ call PKG_DETALLES_VENTAS.Obtener_Detalle_Venta(?, ?) }");
+                    cs.setInt(1, idVenta);
+                    cs.registerOutParameter(2, OracleTypes.CURSOR);
+                    return cs;
+                },
+                (CallableStatementCallback<List<DetalleVentaFila>>) cs -> {
+                    cs.execute();
+                    List<DetalleVentaFila> lista = new ArrayList<>();
+                    try (ResultSet rs = (ResultSet) cs.getObject(2)) {
+                        while (rs.next()) {
+                            DetalleVentaFila row = new DetalleVentaFila();
+                            row.setIdDetalle(rs.getInt("ID_DETALLE"));
+                            row.setIdVenta(rs.getInt("ID_VENTA"));
+                            row.setIdProducto(rs.getInt("ID_PRODUCTO"));
+                            row.setProducto(rs.getString("PRODUCTO"));
+                            row.setCantidad(rs.getInt("CANTIDAD"));
+                            row.setPrecioUnitario(rs.getBigDecimal("PRECIO_UNITARIO"));
+                            row.setSubtotal(rs.getBigDecimal("SUBTOTAL"));
+                            lista.add(row);
+                        }
+                    }
+                    return lista;
+                }
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Usuario obtenerUsuarioPorIdSP(int idUsuario) {
+        return jdbcTemplate.execute(
+                (CallableStatementCreator) con -> {
+                    CallableStatement cs = con.prepareCall("{ call PKG_USUARIO.OBTENER_USUARIO_POR_ID(?, ?) }");
+                    cs.setInt(1, idUsuario);
+                    cs.registerOutParameter(2, oracle.jdbc.OracleTypes.CURSOR);
+                    return cs;
+                },
+                (CallableStatement cs) -> {
+                    cs.execute();
+                    try (ResultSet rs = (ResultSet) cs.getObject(2)) {
+                        if (rs.next()) {
+                            Usuario u = new Usuario();
+
+                            u.setId_Usuario(rs.getInt("ID_USUARIO"));
+                            u.setNombre(rs.getString("NOMBRE"));
+                            u.setCorreo(rs.getString("CORREO"));
+                            u.setContrasena(rs.getString("CONTRASENA"));
+                            u.setDireccion(rs.getString("DIRECCION"));
+                            u.setTelefono(rs.getString("TELEFONO"));
+                            u.setRole(rs.getString("ROLE"));
+                            return u;
+                        }
+                        return null; // no encontrado
+                    }
+                }
+        );
     }
 
 }

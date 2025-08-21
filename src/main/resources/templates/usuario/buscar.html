@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+    <head th:replace="~{layout/plantilla :: head}">
+        <title>FidExpress</title>
+        <meta charset="UTF-8"/>
+        <link href="css/estilos.css" rel="stylesheet" type="text/css"/>
+
+
+    </head>
+    <body class="bg-light">
+        <header th:replace="layout/plantilla::header"></header>
+        <div class="container py-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-7">
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Buscar usuario por ID</h5>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/usuario/buscar}" method="post" class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">ID de usuario</label>
+                                    <input type="number" name="idUsuario" class="form-control" min="1"
+                                           th:value="${idBuscado}" placeholder="Ej: 1001" required>
+                                </div>
+                                <div class="col-12">
+                                    <button class="btn btn-primary">Buscar</button>
+                                    <a th:href="@{/usuario/usuarios}" class="btn btn-outline-secondary">Ir al listado</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Resultado -->
+                    <div th:if="${idBuscado != null}">
+                        <div th:if="${usuarioEncontrado != null}" class="card shadow-sm">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0">Usuario encontrado</h6>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-3">ID</dt>
+                                    <dd class="col-sm-9" th:text="${usuarioEncontrado.id_Usuario}">1</dd>
+
+                                    <dt class="col-sm-3">Nombre</dt>
+                                    <dd class="col-sm-9" th:text="${usuarioEncontrado.nombre}">Juan Pérez</dd>
+
+                                    <dt class="col-sm-3">Correo</dt>
+                                    <dd class="col-sm-9" th:text="${usuarioEncontrado.correo}">juan@correo.com</dd>
+
+                                    <dt class="col-sm-3">Teléfono</dt>
+                                    <dd class="col-sm-9" th:text="${usuarioEncontrado.telefono}">8888-8888</dd>
+
+                                    <dt class="col-sm-3">Dirección</dt>
+                                    <dd class="col-sm-9" th:text="${usuarioEncontrado.direccion}">San José</dd>
+
+                                    <dt class="col-sm-3">Rol</dt>
+                                    <dd class="col-sm-9" th:text="${usuarioEncontrado.role}">cliente</dd>
+                                </dl>
+                            </div>
+                        </div>
+
+                        <div th:if="${usuarioEncontrado == null}" class="alert alert-warning">
+                            No se encontró usuario con ID <strong th:text="${idBuscado}">0</strong>.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <footer th:replace="layout/plantilla::footer"></footer>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

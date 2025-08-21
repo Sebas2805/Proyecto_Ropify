@@ -1,6 +1,7 @@
 
 package com.vital.service;
 
+import com.vital.DTO.DetalleVentaFila;
 import com.vital.DTO.ResumenUsuarioCompraFile;
 import com.vital.domain.Usuario;
 import java.util.List;
@@ -28,5 +29,7 @@ public Usuario IniciarSesion(String correo, String contrasena);
 
 List<ResumenUsuarioCompraFile> obtenerComprasPorUsuario(Integer idUsuario);
 
+List<DetalleVentaFila> obtenerDetalleVenta(Integer idVenta);
 
+Usuario obtenerUsuarioPorIdSP(int idUsuario);
 }
