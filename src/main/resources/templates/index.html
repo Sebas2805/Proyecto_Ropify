@@ -12,67 +12,58 @@
     
     <!-- Banner Principal -->
     <div class="banner">
-        <img src="images/banner-promocion.jpg" alt="Descuento Especial" class="img-fluid"/>
+        
+        <img  src="img/banner.jpg" alt="Descuento Especial" class="img-fluid"/>
         <div class="banner-text">
             <h1>¡Grandes Descuentos Este Fin De Semana!</h1>
-            <p>Disfruta de ofertas irresistibles en tus productos favoritos.</p>
-            <a href="#" class="btn btn-primary">Ver Ofertas</a>
+            <p>Disfruta de ofertas irresistibles en tus productos favoritos</p>
         </div>
     </div>
     
     <br>
     
     <!-- Categorías Populares -->
-    <h2 class="titulo">Categorías Populares</h2>
+    <h2 class="titulo ">Categorías Populares</h2>
     <div class="categories">
         <div class="category-card">
-            <img src="images/category-electronica.jpg" alt="Hoodie" class="img-fluid"/>
+            <img src="img/hoodie.jpg" alt="Hoodie" class="img-fluid"/>
             <h3>Hoodies</h3>
-            <a href="#">Ver más</a>
+            <a th:href="@{/productosClientes}">Ver más</a>
         </div>
         <div class="category-card">
-            <img src="images/category-ropa.jpg" alt="Camisa" class="img-fluid"/>
+            <img src="img/tshirt.jpg" alt="Camisa" class="img-fluid"/>
             <h3>Camisas</h3>
-            <a href="#">Ver más</a>
+            <a th:href="@{/productosClientes}">Ver más</a>
         </div>
         <div class="category-card">
-            <img src="images/category-hogar.jpg" alt="Pantalon" class="img-fluid"/>
+            <img src="img/jeans.jpg"  alt="Pantalon" class="img-fluid"/>
             <h3>Pantalones</h3>
-            <a href="#">Ver más</a>
+            <a th:href="@{/productosClientes}">Ver más</a>
         </div>
       
     </div>
     
     <br>
     
-    <!-- Productos Destacados -->
-    <h2 class="titulo">Productos Destacados</h2>
-    <div class="categories">
-        <div class="category-card">
-            <img src="images/product1.jpg" alt="Producto 1" class="img-fluid"/>
-            <h3>Nombre Producto</h3>
-            <p>Descripción corta del producto.</p>
-            <a href="#" class="btn btn-success">Añadir al carrito</a>
-        </div>
-        <div class="category-card">
-            <img src="images/product2.jpg" alt="Producto 2" class="img-fluid"/>
-            <h3>Nombre Producto</h3>
-            <p>Descripción corta del producto.</p>
-            <a href="#" class="btn btn-success">Añadir al carrito</a>
-        </div>
-        <div class="category-card">
-            <img src="images/product3.jpg" alt="Producto 3" class="img-fluid"/>
-            <h3>Nombre Producto</h3>
-            <p>Descripción corta del producto.</p>
-            <a href="#" class="btn btn-success">Añadir al carrito</a>
-        </div>
+    <!-- Ubicaion -->
+    <h2 class="titulo">Ubicacion</h2>
+    <div class="map-container" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+    <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7859.932352193219!2d-84.04016343839359!3d9.936772313723782!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8fa0e3f47ea4ff37%3A0x7a7818a6a9e5c90c!2sFidelitas%20University%20Campus%20San%20Pedro!5e0!3m2!1sen!2scr!4v1755807949020!5m2!1sen!2scr"  
+        width="100%" 
+        height="400" 
+        style="border:0; border-radius: 10px;" 
+        allowfullscreen="" 
+        loading="lazy" 
+        referrerpolicy="no-referrer-when-downgrade">
+                
+    </iframe>
     </div>
-    
     <br>
     
     <!-- Testimonios -->
-    <h2 class="titulo">Testimonios de Clientes</h2>
-    <div class="testimonials">
+    <h2 class="titulo pt-4">Testimonios de Clientes</h2>
+    <div class="testimonials pt-4">
         <div class="testimonial-card">
             <p>"¡Excelente servicio y productos de calidad! Estoy muy contento con mi compra."</p>
             <p>- Cliente Satisfecho</p>
