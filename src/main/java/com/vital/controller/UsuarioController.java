@@ -156,6 +156,7 @@ public class UsuarioController {
         return "/usuario/buscar";
     }
     
+    ///
     /// Fin nuevo codigo
     ///
 
