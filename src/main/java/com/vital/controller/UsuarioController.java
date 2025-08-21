@@ -1,9 +1,11 @@
 package com.vital.controller;
 
+import com.vital.DTO.DetalleVentaFila;
 import com.vital.DTO.ResumenUsuarioCompraFile;
 import com.vital.domain.Usuario;
 import com.vital.service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -111,7 +113,49 @@ public class UsuarioController {
         }
         return "redirect:/usuario/usuarios";
     }
+    
+    @GetMapping("/ventas/{idVenta}")
+    public String verCompraDetalle(@PathVariable Integer idVenta,
+                                   HttpSession session,
+                                   Model model) {
+        // (Opcional) validar que haya sesión iniciada:
+        // Usuario u = (Usuario) session.getAttribute("usuario");
+        // if (u == null) return "redirect:/usuario/nuevoInicioSesion";
 
+        List<DetalleVentaFila> detalle = usuarioService.obtenerDetalleVenta(idVenta);
+
+        int totalItems = detalle.stream().mapToInt(DetalleVentaFila::getCantidad).sum();
+        BigDecimal totalMonto = detalle.stream()
+                .map(DetalleVentaFila::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("idVenta", idVenta);
+        model.addAttribute("detalle", detalle);
+        model.addAttribute("totalItems", totalItems);
+        model.addAttribute("totalMonto", totalMonto);
+
+        return "/usuario/venta_detalle";
+    }
+    
+    
+    // Formulario de busqueda Usuario por ID
+    
+    // Muestra el formulario vacío
+    @GetMapping("/buscar")
+    public String buscarUsuarioForm(Model model) {
+        model.addAttribute("usuarioEncontrado", null);
+        return "/usuario/buscar"; // templates/usuario/buscar.html
+    }
+
+    // Procesa la búsqueda por ID (desde el form)
+    @PostMapping("/buscar")
+    public String buscarUsuarioSubmit(@RequestParam("idUsuario") int idUsuario, Model model) {
+        Usuario usuario = usuarioService.obtenerUsuarioPorIdSP(idUsuario);
+        model.addAttribute("usuarioEncontrado", usuario);
+        model.addAttribute("idBuscado", idUsuario);
+        return "/usuario/buscar";
+    }
+    
     /// Fin nuevo codigo
     ///
 
@@ -160,4 +204,6 @@ public class UsuarioController {
         redirectAttributes.addFlashAttribute("mensaje", mensaje);
         return "redirect:/usuarios"; //
     }
+    
+    
 }
