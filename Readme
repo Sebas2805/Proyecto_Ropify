@@ -209,7 +209,7 @@ END;
 Paquete de usuarios
 -------------------
 
-
+select * from PRODUCTOS;
 CREATE OR REPLACE PACKAGE PKG_USUARIO AS
     PROCEDURE REGISTRAR_USUARIO (
         p_nombre     IN VARCHAR2,
@@ -244,6 +244,8 @@ CREATE OR REPLACE PACKAGE PKG_USUARIO AS
         p_usuario_id IN NUMBER,
         p_cursor OUT SYS_REFCURSOR
     );
+    
+    PROCEDURE ELIMINAR_USUARIO(p_usuario_id IN NUMBER, p_rows_deleted OUT NUMBER);
 END PKG_USUARIO;
 
 select * from detalle_ventas;
@@ -330,17 +332,89 @@ BEGIN
         WHERE ID_Usuario = p_usuario_id;
 END Obtener_Compras_Por_Usuario;
 
+PROCEDURE ELIMINAR_USUARIO(p_usuario_id IN NUMBER, p_rows_deleted OUT NUMBER) IS
+    v_rows NUMBER := 0;
+  BEGIN
+    -- 1) Eliminar detalle de ventas de ese usuario
+    DELETE FROM DETALLE_VENTAS dv
+    WHERE dv.ID_VENTA IN (SELECT v.ID_VENTA FROM VENTAS v WHERE v.ID_USUARIO = p_usuario_id);
+    v_rows := v_rows + SQL%ROWCOUNT;
+
+    -- 2) Eliminar ventas del usuario
+    DELETE FROM VENTAS v WHERE v.ID_USUARIO = p_usuario_id;
+    v_rows := v_rows + SQL%ROWCOUNT;
+
+    -- 3) Eliminar detalle de carritos del usuario
+    DELETE FROM CARRITO_DETALLE cd
+    WHERE cd.ID_CARRITO IN (SELECT c.ID_CARRITO FROM CARRITOS c WHERE c.ID_USUARIO = p_usuario_id);
+    v_rows := v_rows + SQL%ROWCOUNT;
+
+    -- 4) Eliminar carritos del usuario
+    DELETE FROM CARRITOS c WHERE c.ID_USUARIO = p_usuario_id;
+    v_rows := v_rows + SQL%ROWCOUNT;
+
+    -- 5) Finalmente eliminar el usuario
+    DELETE FROM USUARIOS u WHERE u.ID_USUARIO = p_usuario_id;
+    v_rows := v_rows + SQL%ROWCOUNT;
+
+    p_rows_deleted := v_rows;
+
+  EXCEPTION
+    WHEN OTHERS THEN
+      -- No hagas COMMIT/ROLLBACK aquí; deja la transacción al caller (Spring)
+      RAISE_APPLICATION_ERROR(-20050, 'Error al eliminar usuario '||p_usuario_id||': '||SQLERRM);
+  END ELIMINAR_USUARIO;
+
+
 END PKG_USUARIO;
 
 
 SELECT * FROM usuarios;
 DELETE FROM USUARIOS WHERE ID_USUARIO = 2;
+commit;
+-------------------------------------------------------
+--Paquete de metodo Obtener detalles de ordenes
+-------------------------------------------------------
+
+CREATE OR REPLACE PACKAGE PKG_DETALLES_VENTAS AS
+
+  PROCEDURE Obtener_Detalle_Venta(p_id_venta IN NUMBER, p_cursor OUT SYS_REFCURSOR);
+END PKG_DETALLES_VENTAS;
+
+
+-- Cuerpo
+CREATE OR REPLACE PACKAGE BODY PKG_DETALLES_VENTAS AS
+
+  PROCEDURE Obtener_Detalle_Venta(p_id_venta IN NUMBER, p_cursor OUT SYS_REFCURSOR) IS
+  BEGIN
+    OPEN p_cursor FOR
+      SELECT
+        dv.ID_DETALLE,
+        dv.ID_VENTA,
+        dv.ID_PRODUCTO,
+        p.NOMBRE AS PRODUCTO,
+        dv.CANTIDAD,
+        dv.PRECIO_UNITARIO,
+        (dv.CANTIDAD * dv.PRECIO_UNITARIO) AS SUBTOTAL
+      FROM DETALLE_VENTAS dv
+      JOIN PRODUCTOS p ON p.ID_PRODUCTO = dv.ID_PRODUCTO
+      WHERE dv.ID_VENTA = p_id_venta
+      ORDER BY dv.ID_DETALLE;
+  END Obtener_Detalle_Venta;
+
+END PKG_DETALLES_VENTAS;
+
+-------------------------------------------------------
+-- Final paquete detalles de ordenes
+-------------------------------------------------------
+
 -------------------------------------------------------
 --Crud Productos
 -------------------------------------------------------
 
-CREATE OR REPLACE PACKAGE pkg_productos IS
-    -- Crear producto
+create or replace PACKAGE pkg_productos IS
+ 
+ 
     PROCEDURE crear_producto(
         p_nombre         IN PRODUCTOS.NOMBRE%TYPE,
         p_descripcion    IN PRODUCTOS.DESCRIPCION%TYPE,
@@ -350,13 +424,14 @@ CREATE OR REPLACE PACKAGE pkg_productos IS
         p_id_categoria   IN PRODUCTOS.ID_CATEGORIA%TYPE,
         p_id_tipo_prenda IN PRODUCTOS.ID_TIPO_PRENDA%TYPE
     );
-
-    -- Consultar producto por ID
+ 
+ 
     PROCEDURE consultar_producto(
         p_id_producto IN PRODUCTOS.ID_PRODUCTO%TYPE
     );
-
-    -- Actualizar producto
+ 
+ 
+ 
     PROCEDURE actualizar_producto(
         p_id_producto     IN PRODUCTOS.ID_PRODUCTO%TYPE,
         p_nombre          IN PRODUCTOS.NOMBRE%TYPE,
@@ -367,17 +442,23 @@ CREATE OR REPLACE PACKAGE pkg_productos IS
         p_id_categoria    IN PRODUCTOS.ID_CATEGORIA%TYPE,
         p_id_tipo_prenda  IN PRODUCTOS.ID_TIPO_PRENDA%TYPE
     );
-
-    -- Eliminar producto
+ 
     PROCEDURE eliminar_producto(
         p_id_producto IN PRODUCTOS.ID_PRODUCTO%TYPE
     );
+
+
+    PROCEDURE obtener_productos(
+    p_categoria   IN VARCHAR2,
+    p_tipo_prenda IN VARCHAR2,
+    p_cursor      OUT SYS_REFCURSOR);
 END pkg_productos;
 
 ------------------------------------------------------------
 
-CREATE OR REPLACE PACKAGE BODY pkg_productos IS
-
+create or replace PACKAGE BODY pkg_productos IS
+ 
+ 
     PROCEDURE crear_producto(
         p_nombre         IN PRODUCTOS.NOMBRE%TYPE,
         p_descripcion    IN PRODUCTOS.DESCRIPCION%TYPE,
@@ -396,7 +477,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_productos IS
             p_url_imagen, p_id_categoria, p_id_tipo_prenda
         );
     END;
-
+ 
     PROCEDURE consultar_producto(
         p_id_producto IN PRODUCTOS.ID_PRODUCTO%TYPE
     ) IS
@@ -405,20 +486,20 @@ CREATE OR REPLACE PACKAGE BODY pkg_productos IS
         SELECT * INTO v_producto
         FROM PRODUCTOS
         WHERE ID_PRODUCTO = p_id_producto;
-
+ 
         DBMS_OUTPUT.PUT_LINE('ID: ' || v_producto.ID_PRODUCTO);
         DBMS_OUTPUT.PUT_LINE('Nombre: ' || v_producto.NOMBRE);
-        DBMS_OUTPUT.PUT_LINE('Descripci�n: ' || v_producto.DESCRIPCION);
+        DBMS_OUTPUT.PUT_LINE('Descripción: ' || v_producto.DESCRIPCION);
         DBMS_OUTPUT.PUT_LINE('Precio: ' || v_producto.PRECIO);
-        DBMS_OUTPUT.PUT_LINE('Stock m�nimo: ' || v_producto.STOCK_MINIMO);
+        DBMS_OUTPUT.PUT_LINE('Stock mínimo: ' || v_producto.STOCK_MINIMO);
         DBMS_OUTPUT.PUT_LINE('URL Imagen: ' || v_producto.URL_IMAGEN);
-        DBMS_OUTPUT.PUT_LINE('ID Categor�a: ' || v_producto.ID_CATEGORIA);
+        DBMS_OUTPUT.PUT_LINE('ID Categoría: ' || v_producto.ID_CATEGORIA);
         DBMS_OUTPUT.PUT_LINE('ID Tipo Prenda: ' || v_producto.ID_TIPO_PRENDA);
     EXCEPTION
         WHEN NO_DATA_FOUND THEN
             DBMS_OUTPUT.PUT_LINE('Producto no encontrado.');
     END;
-
+ 
     PROCEDURE actualizar_producto(
         p_id_producto     IN PRODUCTOS.ID_PRODUCTO%TYPE,
         p_nombre          IN PRODUCTOS.NOMBRE%TYPE,
@@ -441,7 +522,7 @@ CREATE OR REPLACE PACKAGE BODY pkg_productos IS
             ID_TIPO_PRENDA = p_id_tipo_prenda
         WHERE ID_PRODUCTO = p_id_producto;
     END;
-
+ 
     PROCEDURE eliminar_producto(
         p_id_producto IN PRODUCTOS.ID_PRODUCTO%TYPE
     ) IS
@@ -449,8 +530,82 @@ CREATE OR REPLACE PACKAGE BODY pkg_productos IS
         DELETE FROM PRODUCTOS
         WHERE ID_PRODUCTO = p_id_producto;
     END;
-
+ 
+ 
+    PROCEDURE obtener_productos(
+    p_categoria   IN VARCHAR2,
+    p_tipo_prenda IN VARCHAR2,
+    p_cursor      OUT SYS_REFCURSOR
+) IS
+BEGIN
+    OPEN p_cursor FOR
+        SELECT 
+            p.id_producto,
+            p.nombre,
+            p.descripcion,
+            p.precio,
+            p.url_imagen,
+            i.stock_actual,
+            c.nombre AS categoria,
+            t.nombre AS tipo_prenda
+        FROM productos p
+        JOIN inventario i 
+            ON p.id_producto = i.id_producto
+        JOIN categorias c
+            ON p.id_categoria = c.id_categoria
+        JOIN tipo_prendas t
+            ON p.id_tipo_prenda = t.id_tipo_prenda
+       WHERE (p_categoria IS NULL OR UPPER(TRIM(c.nombre)) = UPPER(TRIM(p_categoria)))
+  AND (p_tipo_prenda IS NULL OR UPPER(TRIM(t.nombre)) = UPPER(TRIM(p_tipo_prenda)))
+        ORDER BY p.nombre;
+END obtener_productos;
+ 
+ 
 END pkg_productos;
+
+
+create or replace PACKAGE pkg_inventario AS
+    PROCEDURE obtener_inventario(p_cursor OUT SYS_REFCURSOR);
+END pkg_inventario;
+
+create or replace PACKAGE BODY pkg_inventario AS
+ 
+    PROCEDURE obtener_inventario(p_cursor OUT SYS_REFCURSOR) IS
+
+    BEGIN
+
+        OPEN p_cursor FOR
+
+            SELECT i.id_inventario,
+
+                   p.id_producto,
+
+                   p.nombre,
+
+                   i.stock_actual,
+
+                   p.stock_minimo,
+
+                   CASE 
+
+                        WHEN i.stock_actual < p.stock_minimo THEN 'BAJO STOCK'
+
+                        ELSE 'OK'
+
+                   END AS estado
+
+            FROM inventario i
+
+            INNER JOIN productos p 
+
+                   ON i.id_producto = p.id_producto
+
+            ORDER BY i.id_inventario;
+
+    END obtener_inventario;
+ 
+END pkg_inventario;
+ 
 
 ---------------------------------------------------------------------------------------
 
@@ -796,10 +951,14 @@ CREATE OR REPLACE PACKAGE PKG_VENTAS_COMPRAS AS
     FROM DETALLE_VENTAS dv JOIN PRODUCTOS p ON dv.ID_PRODUCTO = p.ID_PRODUCTO
     GROUP BY p.ID_PRODUCTO, p.NOMBRE
     ORDER BY CANTIDAD_VENDIDA DESC;
+    
+
 END PKG_VENTAS_COMPRAS;
 /
 
 CREATE OR REPLACE PACKAGE BODY PKG_VENTAS_COMPRAS AS
+
+PROCEDURE Obtener_Detalle_Venta(p_id_venta IN NUMBER, p_cursor OUT SYS_REFCURSOR) IS
 
   PROCEDURE agregar_producto_carrito(p_id_usuario NUMBER, p_id_producto NUMBER, p_cantidad NUMBER) IS
     v_id_carrito NUMBER;
@@ -998,7 +1157,10 @@ INSERT INTO INVENTARIO (ID_PRODUCTO, STOCK_ACTUAL) VALUES (1, 10);
 INSERT INTO INVENTARIO (ID_PRODUCTO, STOCK_ACTUAL) VALUES (2, 15);
 INSERT INTO INVENTARIO (ID_PRODUCTO, STOCK_ACTUAL) VALUES (3, 5);
 INSERT INTO INVENTARIO (ID_PRODUCTO, STOCK_ACTUAL) VALUES (4, 8);
-INSERT INTO INVENTARIO (ID_PRODUCTO, STOCK_ACTUAL) VALUES (5, 3);
+UPDATE INVENTARIO
+SET STOCK_ACTUAL = 5
+WHERE ID_PRODUCTO = 5;
+
 
 COMMIT;
 
@@ -1010,6 +1172,9 @@ VALUES (1, 1, SYSDATE, 50000);
 INSERT INTO VENTAS (ID_VENTA, ID_USUARIO, FECHA_VENTA, MONTO_TOTAL)
 VALUES (2, 2, SYSDATE, 35000);
 
+INSERT INTO VENTAS (ID_VENTA, ID_USUARIO, FECHA_VENTA, MONTO_TOTAL)
+VALUES (3, 1, SYSDATE, 50000);
+
 -- =========================================
 -- Insertar en DETALLE_VENTAS
 -- =========================================
@@ -1019,4 +1184,34 @@ INSERT INTO DETALLE_VENTAS (ID_DETALLE, ID_VENTA, ID_PRODUCTO, CANTIDAD, PRECIO_
 VALUES (2, 1, 2, 1, 20000);
 
 -- Confirmar transacciones
+COMMIT;
+
+
+INSERT INTO PRODUCTOS (ID_PRODUCTO, NOMBRE, DESCRIPCION, PRECIO, STOCK_MINIMO, URL_IMAGEN, ID_CATEGORIA, ID_TIPO_PRENDA)
+VALUES (SEQ_PRODUCTOS.NEXTVAL, 'Camiseta Básica Azul', 'Camiseta de algodón peinado 100% color azul', 12990, 5, 'https://images.unsplash.com/photo-1693443688057-85f57b872a3c?q=80&w=1287&auto=format&fit=crop', 1, 1);
+
+INSERT INTO PRODUCTOS (ID_PRODUCTO, NOMBRE, DESCRIPCION, PRECIO, STOCK_MINIMO, URL_IMAGEN, ID_CATEGORIA, ID_TIPO_PRENDA)
+VALUES (SEQ_PRODUCTOS.NEXTVAL, 'Pantalón Jogger Negro', 'Jogger unisex fit regular, tela french terry', 24990, 5, 'https://images.unsplash.com/photo-1532413992378-f169ac26fff0?q=80&w=1280&auto=format&fit=crop', 1, 2);
+
+
+UPDATE INVENTARIO 
+SET ID_PRODUCTO = 1, STOCK_ACTUAL = 50, ESTADO = 'Activo', NOMBRE = 'Producto A'
+WHERE ID_INVENTARIO = 1;
+
+UPDATE INVENTARIO 
+SET ID_PRODUCTO = 2, STOCK_ACTUAL = 35, ESTADO = 'Inactivo', NOMBRE = 'Producto B'
+WHERE ID_INVENTARIO = 2;
+
+UPDATE INVENTARIO 
+SET ID_PRODUCTO = 3, STOCK_ACTUAL = 70, ESTADO = 'Activo', NOMBRE = 'Producto C'
+WHERE ID_INVENTARIO = 3;
+
+UPDATE INVENTARIO 
+SET ID_PRODUCTO = 4, STOCK_ACTUAL = 1, ESTADO = 'Activo', NOMBRE = 'Producto D'
+WHERE ID_INVENTARIO = 4;
+
+UPDATE INVENTARIO 
+SET ID_PRODUCTO = 5, STOCK_ACTUAL = 5, ESTADO = 'Inactivo', NOMBRE = 'Producto E'
+WHERE ID_INVENTARIO = 5;
+
 COMMIT;
